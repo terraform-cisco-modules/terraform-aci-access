@@ -14,7 +14,7 @@ locals {
   intf_pg_spine = lookup(lookup(local.access, "interfaces", {}), "spine", {})
   pools         = lookup(local.access, "pools", {})
   sw_pgs_leaf   = lookup(lookup(local.access, "switches", {}), "leaf")
-  sw_pgs_spine   = lookup(lookup(local.access, "switches", {}), "spine")
+  sw_pgs_spine  = lookup(lookup(local.access, "switches", {}), "spine")
 
   #  #__________________________________________________________
   #  #
