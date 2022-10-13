@@ -563,7 +563,7 @@ locals {
           vlan_pool       = v.vlan_pool
         }
       ]
-    ]) : "${i.vlan_pool}-${i.from}" => i
+    ]) : "${i.vlan_pool}-${i.from}-${i.to}" => i
   }
 
 
@@ -691,6 +691,6 @@ locals {
         uplinkName      = element(v.uplink_names, s)
       }
     ]
-    ]) : "${i.dvs}_${i.uplinkName}" => i if i.access_mode == "read-write"
+    ]) : "${i.dvs}-${i.uplinkName}" => i if i.access_mode == "read-write"
   }
 }
