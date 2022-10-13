@@ -11,10 +11,21 @@ variable "model" {
 
 /*_____________________________________________________________________________________________________________________
 
+Access > Policies > Global > MCP Instance Policy — Sensitive Variables
+_______________________________________________________________________________________________________________________
+*/
+variable "mcp_instance_key" {
+  description = "The key or password to uniquely identify the MCP packets within this fabric."
+  sensitive   = true
+  type        = string
+}
+
+
+/*_____________________________________________________________________________________________________________________
+
 Virtual Networking > {switch_provider} > {domain_name} > Credentials — Sensitive Variables
 _______________________________________________________________________________________________________________________
 */
-
 variable "vmm_password_1" {
   default     = ""
   description = "Password for VMM Credentials Policy."

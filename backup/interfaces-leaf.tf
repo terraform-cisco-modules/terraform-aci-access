@@ -1,122 +1,5 @@
 /*_____________________________________________________________________________________________________________________
 
-Leaf Interfaces — Access Policy Group — Variables
-_______________________________________________________________________________________________________________________
-*/
-variable "leaf_interfaces_policy_groups_access" {
-  default = {
-    "default" = {
-      annotation                       = ""
-      attachable_entity_profile        = "**REQUIRED**"
-      cdp_interface_policy             = ""
-      copp_interface_policy            = ""
-      data_plane_policing_egress       = ""
-      data_plane_policing_ingress      = ""
-      description                      = ""
-      dot1x_port_authentication_policy = ""
-      dwdm_policy                      = ""
-      fibre_channel_interface_policy   = ""
-      global_alias                     = ""
-      l2_interface_policy              = ""
-      link_flap_policy                 = ""
-      link_level_flow_control_policy   = ""
-      link_level_policy                = ""
-      lldp_interface_policy            = ""
-      macsec_policy                    = ""
-      mcp_interface_policy             = ""
-      monitoring_policy                = ""
-      netflow_monitor_policies         = []
-      poe_interface_policy             = ""
-      port_security_policy             = ""
-      priority_flow_control_policy     = ""
-      slow_drain_policy                = ""
-      span_destination_groups          = []
-      span_source_groups               = []
-      spanning_tree_interface_policy   = ""
-      storm_control_policy             = ""
-      synce_interface_policy           = ""
-    }
-  }
-  description = <<-EOT
-    Key — Name of the Leaf Interface - Access Policy Group.
-    * annotation: (optional) — An annotation will mark an Object in the GUI with a small blue circle, signifying that it has been modified by  an external source/tool.  Like Nexus Dashboard Orchestrator or in this instance Terraform.
-    * description: (optional) — Description to add to the Object.  The description can be up to 128 characters.
-    * attachable_entity_profile: (required) — The Name of the Global Attachable Entity Profile.
-    * cdp_interface_policy: (optional) — The Name of the CDP Interface Policy.
-    * copp_interface_policy: (optional) — The Name of the CoPP Interafce Policy.
-    * data_plane_policing_egress: (optional) — The Name of the Egress Data Plane Policing Policy.
-    * data_plane_policing_ingress: (optional) — The Name of the Ingress Data Plane Policing Policy.
-    * description: (optional) — escription to add to the Object.  The description can be up to 128 characters.
-    * dot1x_port_authentication_policy: (optional) — The Name of the 802.1X Port Authentication Policy.
-    * dwdm_policy: (optional) — The Name of the DWDM Interface Policy.
-    * fibre_channel_interface_policy: (optional) — The Name of the 802.1X Port Authentication Policy.
-    * global_alias: (optional) — A label, unique within the fabric, that can serve as a substitute for an object's Distinguished Name (DN).  A global alias must be unique accross the fabric.
-    * l2_interface_policy: (optional) — The Name of the Layer2 Interface Policy.
-    * link_flap_policy: (optional) — The Name of the Link Flap Policy.
-    * link_level_flow_control_policy: (optional) — The Name of the Link Level Flow Control Policy.
-    * link_level_policy: (optional) — The Name of the Link Level Policy.
-    * lldp_interface_policy: (optional) — The Name of the LLDP Interface Policy.
-    * macsec_policy: (optional) — The Name of the MACSec Policy.
-    * mcp_interface_policy: (optional) — The Name of the MCP Interface Policy.
-    * monitoring_policy: (optional) — The Name of the Monitoring Policy.
-    * netflow_monitor_policies: (optional) — Map of Objects to assign Netflow Monitor Policies to the Policy Group.
-      - ip_filter_type — IP Filter Type.  Options are:
-        * ce
-        * ipv4
-        * ipv6
-      - netflow_monitor_policy — The Name of the Netflow Monitor Policy.
-    * poe_interface_policy: (optional) — The Name of the PoE Interface Policy.
-    * port_security_policy: (optional) — The Name of the Port Security Policy.
-    * priority_flow_control_policy: (optional) — The Name of the Priority Flow Control Policy.
-    * slow_drain_policy: (optional) — The Name of the Slow Drain Policy.
-    * span_destination_groups: (optional) — The Name of the Span Destination Group.
-    * span_source_groups: (optional) — The Name of the Span Source Groups.
-    * spanning_tree_interface_policy: (optional) — The Name of the Spanning Tree Interface Policy.
-    * storm_control_policy: (optional) — The Name of the Storm Control Policy.
-    * synce_interface_policy: (optional) — The Name of the SyncE Interface Policy.
-  EOT
-  type = map(object(
-    {
-      annotation                       = optional(string)
-      attachable_entity_profile        = string
-      cdp_interface_policy             = optional(string)
-      copp_interface_policy            = optional(string)
-      data_plane_policing_egress       = optional(string)
-      data_plane_policing_ingress      = optional(string)
-      description                      = optional(string)
-      dot1x_port_authentication_policy = optional(string)
-      dwdm_policy                      = optional(string)
-      fibre_channel_interface_policy   = optional(string)
-      global_alias                     = optional(string)
-      l2_interface_policy              = optional(string)
-      link_flap_policy                 = optional(string)
-      link_level_flow_control_policy   = optional(string)
-      link_level_policy                = optional(string)
-      lldp_interface_policy            = optional(string)
-      macsec_policy                    = optional(string)
-      mcp_interface_policy             = optional(string)
-      monitoring_policy                = optional(string)
-      netflow_monitor_policies = optional(list(object(
-        {
-          ip_filter_type         = optional(string)
-          netflow_monitor_policy = string
-        }
-
-      )))
-      port_security_policy           = optional(string)
-      poe_interface_policy           = optional(string)
-      priority_flow_control_policy   = optional(string)
-      slow_drain_policy              = optional(string)
-      span_destination_groups        = optional(list(string))
-      span_source_groups             = optional(list(string))
-      spanning_tree_interface_policy = optional(string)
-      storm_control_policy           = optional(string)
-      synce_interface_policy         = optional(string)
-    }
-  ))
-}
-/*_____________________________________________________________________________________________________________________
-
 API Information:
  - Class: "infraAccPortGrp"
  - Distinguished Name: "uni/infra/funcprof/accportgrp-{name}"
@@ -138,7 +21,7 @@ resource "aci_leaf_access_port_policy_group" "leaf_interfaces_policy_groups_acce
     aci_spanning_tree_interface_policy.policies_spanning_tree_interface
   ]
   for_each    = local.leaf_interfaces_policy_groups_access
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
   # class: infraAttEntityP
@@ -283,7 +166,7 @@ ________________________________________________________________________________
 */
 resource "aci_leaf_breakout_port_group" "leaf_interfaces_policy_groups_breakout" {
   for_each    = local.leaf_interfaces_policy_groups_breakout
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   brkout_map  = each.value.breakout_map
   description = each.value.description
   name        = each.key
@@ -416,7 +299,7 @@ resource "aci_leaf_access_bundle_policy_group" "leaf_interfaces_policy_groups_bu
     aci_spanning_tree_interface_policy.policies_spanning_tree_interface
   ]
   for_each    = local.leaf_interfaces_policy_groups_bundle
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   description = each.value.description
   lag_t       = each.value.link_aggregation_type == "vpc" ? "node" : "link"
   name        = each.key

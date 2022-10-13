@@ -1,6 +1,6 @@
-output "access" {
-  value = local.access
-}
+# output "access" {
+#   value = local.ll_policies
+# }
 # /*_____________________________________________________________________________________________________________________
 # 
 # Domain Policies — Outputs

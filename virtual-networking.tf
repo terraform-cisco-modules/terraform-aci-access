@@ -8,6 +8,9 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_vmm_domain" "vmm_domains" {
+  # depends_on = [
+  #   aci_vlan_pool.pools_vlan
+  # ]
   for_each            = local.vmm_domains
   access_mode         = each.value.access_mode
   annotation          = each.value.annotation

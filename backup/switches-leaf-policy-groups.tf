@@ -64,7 +64,7 @@ ________________________________________________________________________________
 */
 resource "aci_access_switch_policy_group" "switches_leaf_policy_groups" {
   for_each    = local.switches_leaf_policy_groups
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
   # class: bfdIpv4InstPol

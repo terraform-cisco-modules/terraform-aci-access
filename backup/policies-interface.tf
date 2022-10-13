@@ -171,7 +171,7 @@ ________________________________________________________________________________
 */
 resource "aci_miscabling_protocol_interface_policy" "mcp_interface" {
   for_each    = local.mcp_interface
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   admin_st    = each.value.admin_state
   description = each.value.description
   name        = each.key
@@ -188,7 +188,7 @@ ________________________________________________________________________________
 */
 resource "aci_lacp_policy" "port_channel" {
   for_each   = local.port_channel
-  annotation = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation = each.value.annotation
   ctrl = anytrue(
     [each.value.control[0]["fast_select_hot_standby_ports"
       ], each.value.control[0]["graceful_convergence"
@@ -246,7 +246,7 @@ ________________________________________________________________________________
 */
 resource "aci_port_security_policy" "port_security" {
   for_each    = local.port_security
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   description = each.value.description
   maximum     = each.value.maximum_endpoints
   name        = each.key
@@ -265,7 +265,7 @@ ________________________________________________________________________________
 */
 resource "aci_spanning_tree_interface_policy" "spanning_tree_interface" {
   for_each   = local.spanning_tree_interface
-  annotation = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation = each.value.annotation
   ctrl = alltrue(concat(
     [each.value.bpdu_filter == "enabled" ? true : false],
     [each.value.bpdu_guard == "enabled" ? true : false]

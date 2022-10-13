@@ -28,7 +28,7 @@ ________________________________________________________________________________
 */
 resource "aci_spine_switch_policy_group" "switches_spine_policy_groups" {
   for_each    = local.switches_spine_policy_groups
-  annotation  = each.value.annotation != "" ? each.value.annotation : var.annotation
+  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
   relation_infra_rs_iacl_spine_profile = length(compact([each.value.copp_pre_filter])

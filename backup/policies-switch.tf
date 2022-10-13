@@ -5,11 +5,15 @@ API Information:
  - Distinguished Name: "uni/fabric/vpcInst-{name}"
 GUI Location:
  - Fabric -> Access Policies -> Policies -> Switch -> VPC Domain -> Create VPC Domain Policy
+_______________________________________________________________________________________________________________________
 */
-resource "aci_vpc_domain_policy" "vpc_domain_policies" {
-  for_each    = local.vpc_domain_policies
-  annotation  = each.value.annotation
-  dead_intvl  = each.value.dead_interval
-  description = each.value.description
+resource "aci_vpc_domain_policy" "vpc_domain" {
+  for_each = {
+    for v in toset(["default"]) : "default" => v if local.recommended_settings.vpc_domain == true
+  }
+  admin_st    = local.vpc.admin_state
+  annotation  = coalesce(local.vpc.annotation, local.defaults.annotation)
+  dead_intvl  = local.vpc.dead_interval
+  description = local.vpc.description
   name        = each.key
 }
