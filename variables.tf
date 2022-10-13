@@ -9,6 +9,13 @@ variable "model" {
 }
 
 
+variable "apic_version" {
+  default     = ""
+  description = "The Version of ACI Running in the Environment."
+  type        = string
+}
+
+
 /*_____________________________________________________________________________________________________________________
 
 Access > Policies > Global > MCP Instance Policy — Sensitive Variables

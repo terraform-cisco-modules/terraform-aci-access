@@ -9,9 +9,9 @@ ________________________________________________________________________________
 */
 resource "aci_attachable_access_entity_profile" "attachable_access_entity_profiles" {
   depends_on = [
-    aci_l3_domain_profile.domains_layer3,
-    aci_physical_domain.domains_physical,
-    aci_vmm_domain.domains_vmm
+    aci_l3_domain_profile.l3_domains,
+    aci_physical_domain.physical_domains,
+    aci_vmm_domain.vmm_domains
   ]
   for_each                = local.attachable_access_entity_profiles
   annotation              = each.value.annotation
@@ -61,18 +61,18 @@ resource "aci_rest_managed" "dhcp_relay" {
   }
   child {
     rn = length(
-      regexall("external_epg", each.value.dhcp_relay_providers[0]["epg_type"])
-      ) > 0 ? "rsprov-[uni/tn-${each.value.dhcp_relay_providers[0]["tenant"]}/out-${each.value.dhcp_relay_providers[0]["l3out"]}/instP-${each.value.dhcp_relay_providers[0]["epg"]}]" : length(
-      regexall("application_epg", each.value.dhcp_relay_providers[0]["epg_type"])
-    ) > 0 ? "rsprov-[uni/tn-${each.value.dhcp_relay_providers[0]["tenant"]}/ap-${each.value.dhcp_relay_providers[0]["application_profile"]}/epg-${each.value.dhcp_relay_providers[0]["epg"]}]" : ""
+      regexall("external_epg", each.value.epg_type)
+      ) > 0 ? "rsprov-[uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}]" : length(
+      regexall("application_epg", each.value.epg_type)
+    ) > 0 ? "rsprov-[uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}]" : ""
     class_name = "dhcpRsProv"
     content = {
-      addr = each.value.dhcp_relay_providers[0]["address"]
+      addr = each.value.address
       tDn = length(
-        regexall("external_epg", each.value.dhcp_relay_providers[0]["epg_type"])
-        ) > 0 ? "uni/tn-${each.value.dhcp_relay_providers[0]["tenant"]}/out-${each.value.dhcp_relay_providers[0]["l3out"]}/instP-${each.value.dhcp_relay_providers[0]["epg"]}" : length(
-        regexall("application_epg", each.value.dhcp_relay_providers[0]["epg_type"])
-      ) > 0 ? "uni/tn-${each.value.dhcp_relay_providers[0]["tenant"]}/ap-${each.value.dhcp_relay_providers[0]["application_profile"]}/epg-${each.value.dhcp_relay_providers[0]["epg"]}" : ""
+        regexall("external_epg", each.value.epg_type)
+        ) > 0 ? "uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}" : length(
+        regexall("application_epg", each.value.epg_type)
+      ) > 0 ? "uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}" : ""
     }
   }
 }

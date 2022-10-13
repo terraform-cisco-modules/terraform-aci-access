@@ -62,7 +62,7 @@ locals {
   swpgl = local.defaults.access.switches.leaf.policy_groups
   swpgs = local.defaults.access.switches.spine.policy_groups
   # Defaults: Pools -> VLAN
-  vlan = local.defaults.pools.vlan
+  vlan = local.defaults.access.pools.vlan
   # Defaults: Virtual Networking
   vmm         = local.defaults.virtual_networking
   vmm_netflow = local.vmm.vswitch_policy.vmm_netflow_export_policies
@@ -72,8 +72,8 @@ locals {
   # Domain Variables
   #__________________________________________________________
 
-  layer3_domains = {
-    for k, v in lookup(local.domains, "l3_domains", []) : k => {
+  l3_domains = {
+    for k, v in lookup(local.domains, "l3_domains", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.l3.annotation
       ), local.defaults.annotation)
       vlan_pool = lookup(v, "vlan_pool", local.l3.vlan_pool)
@@ -81,7 +81,7 @@ locals {
   }
 
   physical_domains = {
-    for k, v in lookup(local.domains, "physical_domains", []) : k => {
+    for k, v in lookup(local.domains, "physical_domains", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.phys.annotation
       ), local.defaults.annotation)
       vlan_pool = lookup(v, "vlan_pool", local.phys.vlan_pool)
@@ -98,15 +98,15 @@ locals {
   #===================================
 
   attachable_access_entity_profiles = {
-    for k, v in lookup(local.global, "attachable_access_entity_profiles", []) : k => {
+    for k, v in lookup(local.global, "attachable_access_entity_profiles", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.aaep.annotation
       ), local.defaults.annotation)
       description = lookup(v, "description", local.aaep.description)
-      # domains = compact(concat(
-      #   [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.domains_layer3["${i}"].id],
-      #   [for i in lookup(v, "physical_domains", []) : aci_physical_domain.domains_physical["${i}"].id],
-      #   [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.domains_vmm["${i}"].id]
-      # ))
+      domains = compact(concat(
+        [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.l3_domains["${i}"].id],
+        [for i in lookup(v, "physical_domains", []) : aci_physical_domain.physical_domains["${i}"].id],
+        [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.vmm_domains["${i}"].id]
+      ))
     }
   }
 
@@ -173,7 +173,7 @@ locals {
   #=========================
 
   cdp_interface = {
-    for k, v in local.cdp_policies : k => {
+    for k, v in local.cdp_policies : v.name => {
       admin_state  = lookup(v, "admin_state", local.cdp.admin_state)
       annotation   = coalesce(lookup(v, "annotation", local.cdp.annotation), local.defaults.annotation)
       description  = lookup(v, "description", local.cdp.description)
@@ -186,7 +186,7 @@ locals {
   #=========================
 
   fibre_channel_interface = {
-    for k, v in local.fc_policies : k => {
+    for k, v in local.fc_policies : v.name => {
       auto_max_speed        = lookup(v, "auto_max_speed", local.fc.auto_max_speed)
       annotation            = coalesce(lookup(v, "annotation", local.fc.annotation), local.defaults.annotation)
       description           = lookup(v, "description", local.fc.description)
@@ -203,7 +203,7 @@ locals {
   #=========================
 
   l2_interface = {
-    for k, v in local.l2_policies : k => {
+    for k, v in local.l2_policies : v.name => {
       annotation       = coalesce(lookup(v, "annotation", local.l2.annotation), local.defaults.annotation)
       description      = lookup(v, "description", local.l2.description)
       qinq             = lookup(v, "qinq", local.l2.qinq)
@@ -217,7 +217,7 @@ locals {
   #=========================
 
   link_level = {
-    for k, v in local.ll_policies : k => {
+    for k, v in local.ll_policies : v.name => {
       annotation                  = coalesce(lookup(v, "annotation", local.ll.annotation), local.defaults.annotation)
       auto_negotiation            = lookup(v, "auto_negotiation", local.ll.auto_negotiation)
       description                 = lookup(v, "description", local.ll.description)
@@ -233,7 +233,7 @@ locals {
   #=========================
 
   lldp_interface = {
-    for k, v in local.lldp_policies : k => {
+    for k, v in local.lldp_policies : v.name => {
       annotation     = coalesce(lookup(v, "annotation", local.lldp.annotation), local.defaults.annotation)
       description    = lookup(v, "description", local.lldp.description)
       global_alias   = lookup(v, "global_alias", local.lldp.global_alias)
@@ -247,7 +247,7 @@ locals {
   #=========================
 
   mcp_interface = {
-    for k, v in local.mcp_policies : k => {
+    for k, v in local.mcp_policies : v.name => {
       admin_state = lookup(v, "admin_state", local.mcp.admin_state)
       annotation  = coalesce(lookup(v, "annotation", local.mcp.annotation), local.defaults.annotation)
       description = lookup(v, "description", local.mcp.description)
@@ -259,7 +259,7 @@ locals {
   #=========================
 
   port_channel = {
-    for k, v in local.pc_policies : k => {
+    for k, v in local.pc_policies : v.name => {
       annotation  = coalesce(lookup(v, "annotation", local.pc.annotation), local.defaults.annotation)
       description = lookup(v, "description", local.pc.description)
       control = {
@@ -291,7 +291,7 @@ locals {
   #=========================
 
   port_security = {
-    for k, v in local.ps_policies : k => {
+    for k, v in local.ps_policies : v.name => {
       annotation            = coalesce(lookup(v, "annotation", local.ps.annotation), local.defaults.annotation)
       description           = lookup(v, "description", local.ps.description)
       maximum_endpoints     = lookup(v, "maximum_endpoints", local.ps.maximum_endpoints)
@@ -304,7 +304,7 @@ locals {
   #=========================
 
   spanning_tree_interface = {
-    for k, v in local.stp_policies : k => {
+    for k, v in local.stp_policies : v.name => {
       annotation   = coalesce(lookup(v, "annotation", local.stp.annotation), local.defaults.annotation)
       bpdu_guard   = lookup(v, "bpdu_guard", local.stp.bpdu_guard)
       bpdu_filter  = lookup(v, "bpdu_filter", local.stp.bpdu_filter)
@@ -320,7 +320,7 @@ locals {
   #__________________________________________________________
 
   leaf_interfaces_policy_groups_access = {
-    for k, v in lookup(local.intf_pg_leaf, "access", {}) : k => {
+    for k, v in lookup(local.intf_pg_leaf, "access", {}) : v.name => {
       attachable_entity_profile = lookup(v, "attachable_entity_profile", local.laccess.attachable_entity_profile)
       annotation = coalesce(lookup(v, "annotation", local.laccess.annotation
       ), local.defaults.annotation)
@@ -370,7 +370,7 @@ locals {
   }
 
   leaf_interfaces_policy_groups_breakout = {
-    for k, v in lookup(local.intf_pg_leaf, "breakout", {}) : k => {
+    for k, v in lookup(local.intf_pg_leaf, "breakout", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.lbrkout.annotation
       ), local.defaults.annotation)
       breakout_map = lookup(v, "breakout_map", local.lbrkout.breakout_map)
@@ -440,7 +440,7 @@ locals {
   #__________________________________________________________
 
   switches_leaf_policy_groups = {
-    for k, v in lookup(local.sw_pgs_leaf, "policy_groups", {}) : k => {
+    for k, v in lookup(local.sw_pgs_leaf, "policy_groups", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.swpgl.annotation
       ), local.defaults.annotation)
       bfd_ipv4_policy          = lookup(v, "bfd_ipv4_policy", local.swpgl.bfd_ipv4_policy)
@@ -479,7 +479,7 @@ locals {
   #__________________________________________________________
 
   spine_interface_policy_groups = {
-    for k, v in lookup(local.intf_pg_spine, "bundle", {}) : k => {
+    for k, v in lookup(local.intf_pg_spine, "bundle", {}) : v.name => {
       attachable_entity_profile = lookup(v, "attachable_entity_profile", local.saccess.attachable_entity_profile)
       annotation = coalesce(lookup(v, "annotation", local.saccess.annotation
       ), local.defaults.annotation)
@@ -497,7 +497,7 @@ locals {
   #__________________________________________________________
 
   switches_spine_policy_groups = {
-    for k, v in lookup(local.sw_pgs_spine, "policy_groups", {}) : k => {
+    for k, v in lookup(local.sw_pgs_spine, "policy_groups", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.swpgs.annotation
       ), local.defaults.annotation)
       bfd_ipv4_policy          = lookup(v, "bfd_ipv4_policy", local.swpgs.bfd_ipv4_policy)
@@ -519,13 +519,14 @@ locals {
 
   # This first loop is to handle optional attributes and return 
   # default values if the user doesn't enter a value.
-  pools_vlan = {
-    for k, v in lookup(local.pools, "vlan", {}) : k => {
+  vlan_pools = {
+    for k, v in lookup(local.pools, "vlan", {}) : v.name => {
       allocation_mode = lookup(v, "allocation_mode", local.vlan.allocation_mode)
-      annotation      = coalesce(lookup(v, "annotation     ", local.vlan.annotation)
+      annotation = coalesce(lookup(v, "annotation", local.vlan.annotation)
       , local.defaults.annotation)
-      description     = lookup(v, "description    ", local.vlan.description)
-      encap_blocks    = lookup(v, "encap_blocks   ", [])
+      description  = lookup(v, "description", local.vlan.description)
+      encap_blocks = lookup(v, "encap_blocks", [])
+      name         = v.name
     }
   }
 
@@ -537,57 +538,33 @@ locals {
   And then to return these values as a list
   */
   vlan_ranges_loop_1 = flatten([
-    for key, value in local.pools_vlan : [
-      for k, v in value.encap_blocks : {
-        allocation_mode = v.allocation_mode != null ? v.allocation_mode : "inherit"
+    for key, value in local.vlan_pools : [
+      for v in value.encap_blocks : {
+        allocation_mode = lookup(v, "allocation_mode", local.vlan.encap_blocks.allocation_mode)
         annotation      = value.annotation
-        description     = v.description != null ? v.description : ""
-        key1            = key
-        key2            = k
-        role            = v.role != null ? v.role : "external"
-        vlan_split = length(regexall("-", v.vlan_range)) > 0 ? tolist(split(",", v.vlan_range)) : length(
-          regexall(",", v.vlan_range)) > 0 ? tolist(split(",", v.vlan_range)
-        ) : [v.vlan_range]
-        vlan_range = v.vlan_range
+        description     = lookup(v, "description", local.vlan.encap_blocks.description)
+        role            = lookup(v, "role", local.vlan.encap_blocks.role)
+        vlan_list       = tolist(split(",", v.vlan_range))
+        vlan_pool       = key
       }
     ]
   ])
 
-  # Loop 2 takes a list that contains a "-" or a "," and expands those values
-  # into a full list.  So [1-5] becomes [1, 2, 3, 4, 5]
-  vlan_ranges_loop_2 = {
-    for k, v in local.vlan_ranges_loop_1 : "${v.key1}_${v.key2}" => {
-      allocation_mode = v.allocation_mode
-      annotation      = v.annotation
-      description     = v.description
-      key1            = v.key1
-      key2            = v.key2
-      role            = v.role
-      vlan_list = length(regexall("(,|-)", jsonencode(v.vlan_range))) > 0 ? flatten([
-        for s in v.vlan_split : length(regexall("-", s)) > 0 ? [for v in range(tonumber(
-          element(split("-", s), 0)), (tonumber(element(split("-", s), 1)) + 1)
-        ) : tonumber(v)] : [s]
-      ]) : v.vlan_split
-    }
+  vlan_ranges = {
+    for i in flatten([
+      for v in local.vlan_ranges_loop_1 : [
+        for s in v.vlan_list : {
+          allocation_mode = v.allocation_mode
+          annotation      = v.annotation
+          description     = v.description
+          from            = length(regexall("-", s)) > 0 ? element(split("-", s), 0) : s
+          role            = v.role
+          to              = length(regexall("-", s)) > 0 ? element(split("-", s), 1) : s
+          vlan_pool       = v.vlan_pool
+        }
+      ]
+    ]) : "${i.vlan_pool}-${i.from}" => i
   }
-
-  # Loop 3 will take the vlan_list created in Loop 2 and expand this
-  # out to a map of objects per vlan.
-  vlan_ranges_loop_3 = flatten([
-    for k, v in local.vlan_ranges_loop_2 : [
-      for s in v.vlan_list : {
-        allocation_mode = v.allocation_mode
-        annotation      = v.annotation
-        description     = v.description
-        key1            = v.key1
-        role            = v.role
-        vlan            = s
-      }
-    ]
-  ])
-
-  # And lastly loop3's list is converted back to a map of objects
-  vlan_ranges = { for k, v in local.vlan_ranges_loop_3 : "${v.key1}_${v.vlan}" => v }
 
 
   #__________________________________________________________

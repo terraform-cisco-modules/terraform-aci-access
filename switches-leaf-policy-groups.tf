@@ -75,11 +75,13 @@ resource "aci_access_switch_policy_group" "switches_leaf_policy_groups" {
   ) > 0 ? "uni/infra/bfdIpv6Inst-${each.value.bfd_ipv6_policy}" : ""
   # class: bfdMhIpv4InstPol
   relation_infra_rs_bfd_mh_ipv4_inst_pol = length(regexall(
-    "^5", var.apic_version)) > 0 && length(compact([each.value.bfd_multihop_ipv4_policy])
+    "^5", coalesce(var.apic_version, local.defaults.apic_version))
+    ) > 0 && length(compact([each.value.bfd_multihop_ipv4_policy])
   ) > 0 ? "uni/infra/bfdMhIpv4Inst-${each.value.bfd_multihop_ipv4_policy}" : ""
   # class: bfdMhIpv6InstPol
   relation_infra_rs_bfd_mh_ipv6_inst_pol = length(regexall(
-    "^5", var.apic_version)) > 0 && length(compact([each.value.bfd_multihop_ipv6_policy])
+    "^5", coalesce(var.apic_version, local.defaults.apic_version))
+    ) > 0 && length(compact([each.value.bfd_multihop_ipv6_policy])
   ) > 0 ? "uni/infra/bfdMhIpv6Inst-${each.value.bfd_multihop_ipv6_policy}" : ""
   # class: equipmentFlashConfigPol
   relation_infra_rs_equipment_flash_config_pol = length(compact([each.value.equipment_flash_config])

@@ -9,9 +9,9 @@ ________________________________________________________________________________
 */
 resource "aci_spine_port_policy_group" "spine_interface_policy_groups" {
   depends_on = [
-    aci_attachable_access_entity_profile.global_attachable_access_entity_profiles,
-    aci_cdp_interface_policy.policies_cdp_interface,
-    aci_fabric_if_pol.policies_link_level,
+    aci_attachable_access_entity_profile.attachable_access_entity_profiles,
+    aci_cdp_interface_policy.cdp_interface,
+    aci_fabric_if_pol.link_level,
   ]
   for_each    = local.spine_interface_policy_groups
   annotation  = each.value.annotation
@@ -45,7 +45,7 @@ resource "aci_rest_managed" "spine_interface_policy_groups_global_alias" {
   depends_on = [
     aci_spine_port_policy_group.spine_interface_policy_groups,
   ]
-  for_each   = local.spine_interface_policy_groups_global_alias
+  for_each   = { for k, v in local.spine_interface_policy_groups : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/funcprof/spaccportgrp-${each.key}"
   content = {

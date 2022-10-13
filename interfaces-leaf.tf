@@ -10,15 +10,15 @@ ________________________________________________________________________________
 */
 resource "aci_leaf_access_port_policy_group" "leaf_interfaces_policy_groups_access" {
   depends_on = [
-    aci_attachable_access_entity_profile.global_attachable_access_entity_profiles,
-    aci_cdp_interface_policy.policies_cdp_interface,
-    aci_interface_fc_policy.policies_fibre_channel_interface,
-    aci_l2_interface_policy.policies_l2_interface,
-    aci_fabric_if_pol.policies_link_level,
-    aci_lldp_interface_policy.policies_lldp_interface,
-    aci_miscabling_protocol_interface_policy.policies_mcp_interface,
-    aci_port_security_policy.policies_port_security,
-    aci_spanning_tree_interface_policy.policies_spanning_tree_interface
+    aci_attachable_access_entity_profile.attachable_access_entity_profiles,
+    aci_cdp_interface_policy.cdp_interface,
+    aci_interface_fc_policy.fibre_channel_interface,
+    aci_l2_interface_policy.l2_interface,
+    aci_fabric_if_pol.link_level,
+    aci_lldp_interface_policy.lldp_interface,
+    aci_miscabling_protocol_interface_policy.mcp_interface,
+    aci_port_security_policy.port_security,
+    aci_spanning_tree_interface_policy.spanning_tree_interface
   ]
   for_each    = local.leaf_interfaces_policy_groups_access
   annotation  = each.value.annotation
@@ -114,44 +114,12 @@ resource "aci_rest_managed" "leaf_interfaces_policy_groups_access_global_alias" 
   depends_on = [
     aci_leaf_access_port_policy_group.leaf_interfaces_policy_groups_access,
   ]
-  for_each   = local.leaf_interfaces_policy_groups_access_global_alias
+  for_each   = { for k, v in local.leaf_interfaces_policy_groups_access : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/funcprof/accportgrp-${each.key}"
   content = {
     name = each.value.global_alias
   }
-}
-/*_____________________________________________________________________________________________________________________
-
-Leaf Interfaces — Breakout Policy Group — Variables
-_______________________________________________________________________________________________________________________
-*/
-variable "leaf_interfaces_policy_groups_breakout" {
-  default = {
-    "default" = {
-      annotation   = ""
-      breakout_map = "10g-4x"
-      description  = ""
-    }
-  }
-  description = <<-EOT
-    Key — Name of the Leaf Breakout Policy Group.
-    * annotation: (optional) — An annotation will mark an Object in the GUI with a small blue circle, signifying that it has been modified by  an external source/tool.  Like Nexus Dashboard Orchestrator or in this instance Terraform.
-    * breakout_map: (required) — Enable the port as a breakout port with one of the following options:
-      - 10g-4x — Enables a 40 Gigabit Ethernet (GE) port to be connected with a Cisco 40-Gigabit-to-4x10-Gigabit breakout cable to 4 10GE-capable devices.
-      - 25g-4x — Enables a 100GE port to be connected with a Cisco 100-Gigabit-to-4x25-Gigabit breakout cable to 4 25GE-capable devices.
-      - 50g-8x — Enables a 400GE port to be connected with a Cisco 400-Gigabit-to-8x50-Gigabit breakout cable to 8 50GE-capable devices.
-      - 100g-2x — Enables a 400GE port to be connected with a Cisco 400-Gigabit-to-4x25-Gigabit breakout cable to 2 200GE-capable devices.
-      - 100g-4x — Enables a 400GE port to be connected with a Cisco 400-Gigabit-to-4x100-Gigabit breakout cable to 4 100GE-capable devices.
-    * description: (optional) — Description to add to the Object.  The description can be up to 128 characters.
-  EOT
-  type = map(object(
-    {
-      annotation   = optional(string)
-      breakout_map = string
-      description  = optional(string)
-    }
-  ))
 }
 
 
@@ -171,109 +139,6 @@ resource "aci_leaf_breakout_port_group" "leaf_interfaces_policy_groups_breakout"
   description = each.value.description
   name        = each.key
 }
-/*_____________________________________________________________________________________________________________________
-
-Leaf Interfaces — Bundle (PC|VPC) Policy Group — Variables
-_______________________________________________________________________________________________________________________
-*/
-variable "leaf_interfaces_policy_groups_bundle" {
-  default = {
-    "default" = {
-      annotation                     = ""
-      attachable_entity_profile      = ""
-      cdp_interface_policy           = ""
-      copp_interface_policy          = ""
-      data_plane_policing_egress     = ""
-      data_plane_policing_ingress    = ""
-      description                    = ""
-      fibre_channel_interface_policy = ""
-      l2_interface_policy            = ""
-      link_aggregation_policy        = ""
-      link_aggregation_type          = ""
-      link_flap_policy               = ""
-      link_level_flow_control_policy = ""
-      link_level_policy              = ""
-      lldp_interface_policy          = ""
-      macsec_policy                  = ""
-      mcp_interface_policy           = ""
-      monitoring_policy              = ""
-      netflow_monitor_policies       = []
-      port_security_policy           = ""
-      priority_flow_control_policy   = ""
-      slow_drain_policy              = ""
-      span_destination_groups        = ""
-      span_source_groups             = ""
-      storm_control_policy           = ""
-    }
-  }
-  description = <<-EOT
-    Key — Name of the Leaf Interface - Access Policy Group.
-    * annotation: (optional) — An annotation will mark an Object in the GUI with a small blue circle, signifying that it has been modified by  an external source/tool.  Like Nexus Dashboard Orchestrator or in this instance Terraform.
-    * description: (optional) — Description to add to the Object.  The description can be up to 128 characters.
-    * attachable_entity_profile: (required) — The Name of the Global Attachable Entity Profile.
-    * cdp_interface_policy: (optional) — The Name of the CDP Interface Policy.
-    * copp_interface_policy: (optional) — The Name of the CoPP Interafce Policy.
-    * data_plane_policing_egress: (optional) — The Name of the Egress Data Plane Policing Policy.
-    * data_plane_policing_ingress: (optional) — The Name of the Ingress Data Plane Policing Policy.
-    * description: (optional) — escription to add to the Object.  The description can be up to 128 characters.
-    * fibre_channel_interface_policy: (optional) — The Name of the 802.1X Port Authentication Policy.
-    * l2_interface_policy: (optional) — The Name of the Layer2 Interface Policy.
-    * link_aggregation_policy: (optional) — The Name of the Link Aggreation Policy.
-    * link_aggregation_type: (optional) — The Type of Link Aggregation.  Options are:
-      - pc
-      - vpc: (default)
-    * link_flap_policy: (optional) — The Name of the Link Flap Policy.
-    * link_level_flow_control_policy: (optional) — The Name of the Link Level Flow Control Policy.
-    * link_level_policy: (optional) — The Name of the Link Level Policy.
-    * lldp_interface_policy: (optional) — The Name of the LLDP Interface Policy.
-    * macsec_policy: (optional) — The Name of the MACSec Policy.
-    * mcp_interface_policy: (optional) — The Name of the MCP Interface Policy.
-    * monitoring_policy: (optional) — The Name of the Monitoring Policy.
-    * netflow_monitor_policies: (optional) — Map of Objects to assign Netflow Monitor Policies to the Policy Group.
-      - ip_filter_type — IP Filter Type.  Options are:
-        * ce
-        * ipv4: (default)
-        * ipv6
-      - netflow_monitor_policy — The Name of the Netflow Monitor Policy.
-    * port_security_policy: (optional) — The Name of the Port Security Policy.
-    * priority_flow_control_policy: (optional) — The Name of the Priority Flow Control Policy.
-    * slow_drain_policy: (optional) — The Name of the Slow Drain Policy.
-    * span_destination_groups: (optional) — The Name of the Span Destination Group.
-    * span_source_groups: (optional) — The Name of the Span Source Groups.
-    * spanning_tree_interface_policy: (optional) — The Name of the Spanning Tree Interface Policy.
-    * storm_control_policy: (optional) — The Name of the Storm Control Policy.
-  EOT
-  type = map(object(
-    {
-      annotation                     = optional(string)
-      attachable_entity_profile      = string
-      cdp_interface_policy           = optional(string)
-      copp_interface_policy          = optional(string)
-      data_plane_policing_egress     = optional(string)
-      data_plane_policing_ingress    = optional(string)
-      description                    = optional(string)
-      fibre_channel_interface_policy = optional(string)
-      l2_interface_policy            = optional(string)
-      link_aggregation_policy        = optional(string)
-      link_aggregation_type          = optional(string)
-      link_flap_policy               = optional(string)
-      link_level_flow_control_policy = optional(string)
-      link_level_policy              = optional(string)
-      lldp_interface_policy          = optional(string)
-      macsec_policy                  = optional(string)
-      mcp_interface_policy           = optional(string)
-      monitoring_policy              = optional(string)
-      netflow_monitor_policies       = optional(list(string))
-      port_security_policy           = optional(string)
-      priority_flow_control_policy   = optional(string)
-      slow_drain_policy              = optional(string)
-      span_destination_groups        = optional(string)
-      span_source_groups             = optional(string)
-      spanning_tree_interface_policy = optional(string)
-      storm_control_policy           = optional(string)
-    }
-  ))
-}
 
 
 /*_____________________________________________________________________________________________________________________
@@ -287,16 +152,16 @@ ________________________________________________________________________________
 */
 resource "aci_leaf_access_bundle_policy_group" "leaf_interfaces_policy_groups_bundle" {
   depends_on = [
-    aci_attachable_access_entity_profile.global_attachable_access_entity_profiles,
-    aci_cdp_interface_policy.policies_cdp_interface,
-    aci_interface_fc_policy.policies_fibre_channel_interface,
-    aci_l2_interface_policy.policies_l2_interface,
-    aci_lacp_policy.policies_port_channel,
-    aci_fabric_if_pol.policies_link_level,
-    aci_lldp_interface_policy.policies_lldp_interface,
-    aci_miscabling_protocol_interface_policy.policies_mcp_interface,
-    aci_port_security_policy.policies_port_security,
-    aci_spanning_tree_interface_policy.policies_spanning_tree_interface
+    aci_attachable_access_entity_profile.attachable_access_entity_profiles,
+    aci_cdp_interface_policy.cdp_interface,
+    aci_interface_fc_policy.fibre_channel_interface,
+    aci_l2_interface_policy.l2_interface,
+    aci_lacp_policy.port_channel,
+    aci_fabric_if_pol.link_level,
+    aci_lldp_interface_policy.lldp_interface,
+    aci_miscabling_protocol_interface_policy.mcp_interface,
+    aci_port_security_policy.port_security,
+    aci_spanning_tree_interface_policy.spanning_tree_interface
   ]
   for_each    = local.leaf_interfaces_policy_groups_bundle
   annotation  = each.value.annotation
@@ -360,11 +225,11 @@ resource "aci_leaf_access_bundle_policy_group" "leaf_interfaces_policy_groups_bu
   relation_infra_rs_qos_sd_if_pol = length(compact([each.value.slow_drain_policy])
   ) > 0 ? "uni/infra/qossdpol-${each.value.slow_drain_policy}" : ""
   # class: spanVDestGrp
-  relation_infra_rs_span_v_dest_grp = length(compact([each.value.span_destination_groups])
-  ) > 0 ? ["uni/infra/vdestgrp-${each.value.span_destination_groups}"] : []
+  relation_infra_rs_span_v_dest_grp = length(compact(each.value.span_destination_groups)
+  ) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vdestgrp-${s}"] : []
   # class: spanVSrcGrp
-  relation_infra_rs_span_v_src_grp = length(compact([each.value.span_source_groups])
-  ) > 0 ? ["uni/infra/vsrcgrp-${each.value.span_source_groups}"] : []
+  relation_infra_rs_span_v_src_grp = length(compact(each.value.span_source_groups)
+  ) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vsrcgrp-${s}"] : []
   # class: stormctrlIfPol
   relation_infra_rs_stormctrl_if_pol = length(compact([each.value.storm_control_policy])
   ) > 0 ? "uni/infra/stormctrlifp-${each.value.storm_control_policy}" : ""

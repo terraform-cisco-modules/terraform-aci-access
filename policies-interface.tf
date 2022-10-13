@@ -29,7 +29,7 @@ resource "aci_rest_managed" "cdp_interface_global_alias" {
   depends_on = [
     aci_cdp_interface_policy.cdp_interface,
   ]
-  for_each   = local.cdp_interface_global_alias
+  for_each   = { for k, v in local.cdp_interface : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/cdpIfP-${each.key}"
   content = {
@@ -112,7 +112,7 @@ resource "aci_rest_managed" "link_level_global_alias" {
   depends_on = [
     aci_fabric_if_pol.link_level,
   ]
-  for_each   = local.link_level_global_alias
+  for_each   = { for k, v in local.link_level : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/hintfpol-${each.key}"
   content = {
@@ -152,7 +152,7 @@ resource "aci_rest_managed" "lldp_interface_global_alias" {
   depends_on = [
     aci_lldp_interface_policy.lldp_interface,
   ]
-  for_each   = local.link_level_global_alias
+  for_each   = { for k, v in local.lldp_interface : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/lldpIfP-${each.key}"
   content = {
@@ -190,20 +190,20 @@ resource "aci_lacp_policy" "port_channel" {
   for_each   = local.port_channel
   annotation = each.value.annotation
   ctrl = anytrue(
-    [each.value.control[0]["fast_select_hot_standby_ports"
-      ], each.value.control[0]["graceful_convergence"
-      ], each.value.control[0]["load_defer_member_ports"
-      ], each.value.control[0]["suspend_individual_port"
-      ], each.value.control[0]["symmetric_hashing"]]) ? compact(concat(
-      [length(regexall(true, each.value.control[0].fast_select_hot_standby_ports)
+    [each.value.control["fast_select_hot_standby_ports"
+      ], each.value.control["graceful_convergence"
+      ], each.value.control["load_defer_member_ports"
+      ], each.value.control["suspend_individual_port"
+      ], each.value.control["symmetric_hashing"]]) ? compact(concat(
+      [length(regexall(true, each.value.control.fast_select_hot_standby_ports)
         ) > 0 ? "fast-sel-hot-stdby" : ""
-        ], [length(regexall(true, each.value.control[0].graceful_convergence)
+        ], [length(regexall(true, each.value.control.graceful_convergence)
         ) > 0 ? "graceful-conv" : ""
-        ], [length(regexall(true, each.value.control[0].load_defer_member_ports)
+        ], [length(regexall(true, each.value.control.load_defer_member_ports)
         ) > 0 ? "load-defer" : ""
-        ], [length(regexall(true, each.value.control[0].suspend_individual_port)
+        ], [length(regexall(true, each.value.control.suspend_individual_port)
         ) > 0 ? "susp-individual" : ""
-        ], [length(regexall(true, each.value.control[0].symmetric_hashing)
+        ], [length(regexall(true, each.value.control.symmetric_hashing)
     ) > 0 ? "symmetric-hash" : ""])) : [
   "fast-sel-hot-stdby", "graceful-conv", "susp-individual"]
   description = each.value.description
@@ -227,7 +227,7 @@ resource "aci_rest_managed" "port_channel_global_alias" {
   depends_on = [
     aci_lacp_policy.port_channel,
   ]
-  for_each   = local.port_channel_global_alias
+  for_each   = { for k, v in local.port_channel : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/lacplagp-${each.key}"
   content = {
@@ -294,7 +294,7 @@ resource "aci_rest_managed" "spanning_tree_interface_global_alias" {
   depends_on = [
     aci_spanning_tree_interface_policy.spanning_tree_interface,
   ]
-  for_each   = local.spanning_tree_interface_global_alias
+  for_each   = { for k, v in local.spanning_tree_interface : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
   dn         = "uni/infra/ifPol-${each.key}"
   content = {
