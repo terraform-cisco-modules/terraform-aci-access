@@ -563,7 +563,7 @@ locals {
           vlan_pool       = v.vlan_pool
         }
       ]
-    ]) : "${i.vlan_pool}-${i.from}-${i.to}" => i
+    ]) : "${i.vlan_pool}:${i.from}-${i.to}" => i
   }
 
 
@@ -639,7 +639,7 @@ locals {
           vxlan_pool = lookup(v, "vxlan_pool", local.vmm.controllers.vxlan_pool)
         }
       ]
-    ]) : "${i.dvs}_${i.hostname}" => i
+    ]) : "${i.dvs}:${i.hostname}" => i
   }
   vswitch_policies = {
     for i in flatten([
@@ -691,6 +691,6 @@ locals {
         uplinkName      = element(v.uplink_names, s)
       }
     ]
-    ]) : "${i.dvs}-${i.uplinkName}" => i if i.access_mode == "read-write"
+    ]) : "${i.dvs}:${i.uplinkName}" => i if i.access_mode == "read-write"
   }
 }
