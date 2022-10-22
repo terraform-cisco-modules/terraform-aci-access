@@ -75,7 +75,7 @@ locals {
   l3_domains = {
     for k, v in lookup(local.domains, "l3_domains", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.l3.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       vlan_pool = lookup(v, "vlan_pool", local.l3.vlan_pool)
     }
   }
@@ -83,7 +83,7 @@ locals {
   physical_domains = {
     for k, v in lookup(local.domains, "physical_domains", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.phys.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       vlan_pool = lookup(v, "vlan_pool", local.phys.vlan_pool)
     }
   }
@@ -100,7 +100,7 @@ locals {
   attachable_access_entity_profiles = {
     for k, v in lookup(local.global, "attachable_access_entity_profiles", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.aaep.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       description = lookup(v, "description", local.aaep.description)
       domains = compact(concat(
         [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.l3_domains["${i}"].id],
@@ -120,7 +120,7 @@ locals {
         for s in range(length([for a in v.name_addr_list : a[0]])) : {
           address = element(element(v.name_addr_list, s), 1)
           annotation = coalesce(lookup(v, "annotation", local.dhcp.annotation
-          ), local.defaults.annotation)
+          ), var.annotation)
           application_profile = lookup(v, "application_profile", local.dhcp.application_profile)
           description         = lookup(v, "description", local.dhcp.description)
           epg                 = v.epg
@@ -175,7 +175,7 @@ locals {
   cdp_interface = {
     for k, v in local.cdp_policies : v.name => {
       admin_state  = lookup(v, "admin_state", local.cdp.admin_state)
-      annotation   = coalesce(lookup(v, "annotation", local.cdp.annotation), local.defaults.annotation)
+      annotation   = coalesce(lookup(v, "annotation", local.cdp.annotation), var.annotation)
       description  = lookup(v, "description", local.cdp.description)
       global_alias = lookup(v, "global_alias", local.cdp.global_alias)
     }
@@ -188,7 +188,7 @@ locals {
   fibre_channel_interface = {
     for k, v in local.fc_policies : v.name => {
       auto_max_speed        = lookup(v, "auto_max_speed", local.fc.auto_max_speed)
-      annotation            = coalesce(lookup(v, "annotation", local.fc.annotation), local.defaults.annotation)
+      annotation            = coalesce(lookup(v, "annotation", local.fc.annotation), var.annotation)
       description           = lookup(v, "description", local.fc.description)
       fill_pattern          = lookup(v, "fill_pattern", local.fc.fill_pattern)
       port_mode             = lookup(v, "port_mode", local.fc.port_mode)
@@ -204,7 +204,7 @@ locals {
 
   l2_interface = {
     for k, v in local.l2_policies : v.name => {
-      annotation       = coalesce(lookup(v, "annotation", local.l2.annotation), local.defaults.annotation)
+      annotation       = coalesce(lookup(v, "annotation", local.l2.annotation), var.annotation)
       description      = lookup(v, "description", local.l2.description)
       qinq             = lookup(v, "qinq", local.l2.qinq)
       reflective_relay = lookup(v, "reflective_relay", local.l2.reflective_relay)
@@ -218,7 +218,7 @@ locals {
 
   link_level = {
     for k, v in local.ll_policies : v.name => {
-      annotation                  = coalesce(lookup(v, "annotation", local.ll.annotation), local.defaults.annotation)
+      annotation                  = coalesce(lookup(v, "annotation", local.ll.annotation), var.annotation)
       auto_negotiation            = lookup(v, "auto_negotiation", local.ll.auto_negotiation)
       description                 = lookup(v, "description", local.ll.description)
       global_alias                = lookup(v, "global_alias", local.ll.global_alias)
@@ -234,7 +234,7 @@ locals {
 
   lldp_interface = {
     for k, v in local.lldp_policies : v.name => {
-      annotation     = coalesce(lookup(v, "annotation", local.lldp.annotation), local.defaults.annotation)
+      annotation     = coalesce(lookup(v, "annotation", local.lldp.annotation), var.annotation)
       description    = lookup(v, "description", local.lldp.description)
       global_alias   = lookup(v, "global_alias", local.lldp.global_alias)
       receive_state  = lookup(v, "receive_state", local.lldp.receive_state)
@@ -249,7 +249,7 @@ locals {
   mcp_interface = {
     for k, v in local.mcp_policies : v.name => {
       admin_state = lookup(v, "admin_state", local.mcp.admin_state)
-      annotation  = coalesce(lookup(v, "annotation", local.mcp.annotation), local.defaults.annotation)
+      annotation  = coalesce(lookup(v, "annotation", local.mcp.annotation), var.annotation)
       description = lookup(v, "description", local.mcp.description)
     }
   }
@@ -260,7 +260,7 @@ locals {
 
   port_channel = {
     for k, v in local.pc_policies : v.name => {
-      annotation  = coalesce(lookup(v, "annotation", local.pc.annotation), local.defaults.annotation)
+      annotation  = coalesce(lookup(v, "annotation", local.pc.annotation), var.annotation)
       description = lookup(v, "description", local.pc.description)
       control = {
         fast_select_hot_standby_ports = lookup(lookup(
@@ -292,7 +292,7 @@ locals {
 
   port_security = {
     for k, v in local.ps_policies : v.name => {
-      annotation            = coalesce(lookup(v, "annotation", local.ps.annotation), local.defaults.annotation)
+      annotation            = coalesce(lookup(v, "annotation", local.ps.annotation), var.annotation)
       description           = lookup(v, "description", local.ps.description)
       maximum_endpoints     = lookup(v, "maximum_endpoints", local.ps.maximum_endpoints)
       port_security_timeout = lookup(v, "port_security_timeout", local.ps.port_security_timeout)
@@ -305,7 +305,7 @@ locals {
 
   spanning_tree_interface = {
     for k, v in local.stp_policies : v.name => {
-      annotation   = coalesce(lookup(v, "annotation", local.stp.annotation), local.defaults.annotation)
+      annotation   = coalesce(lookup(v, "annotation", local.stp.annotation), var.annotation)
       bpdu_guard   = lookup(v, "bpdu_guard", local.stp.bpdu_guard)
       bpdu_filter  = lookup(v, "bpdu_filter", local.stp.bpdu_filter)
       description  = lookup(v, "description", local.stp.description)
@@ -323,7 +323,7 @@ locals {
     for k, v in lookup(local.intf_pg_leaf, "access", {}) : v.name => {
       attachable_entity_profile = lookup(v, "attachable_entity_profile", local.laccess.attachable_entity_profile)
       annotation = coalesce(lookup(v, "annotation", local.laccess.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       cdp_interface_policy        = lookup(v, "cdp_interface_policy", local.laccess.cdp_interface_policy)
       copp_interface_policy       = lookup(v, "copp_interface_policy", local.laccess.copp_interface_policy)
       data_plane_policing_egress  = lookup(v, "data_plane_policing_egress", local.laccess.data_plane_policing_egress)
@@ -372,7 +372,7 @@ locals {
   leaf_interfaces_policy_groups_breakout = {
     for k, v in lookup(local.intf_pg_leaf, "breakout", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.lbrkout.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       breakout_map = lookup(v, "breakout_map", local.lbrkout.breakout_map)
       description  = lookup(v, "description", local.lbrkout.description)
     }
@@ -385,7 +385,7 @@ locals {
         for s in v.names : {
           attachable_entity_profile = lookup(v, "attachable_entity_profile", local.lbundle.attachable_entity_profile)
           annotation = coalesce(lookup(v, "annotation", local.lbundle.annotation
-          ), local.defaults.annotation)
+          ), var.annotation)
           cdp_interface_policy  = lookup(v, "cdp_interface_policy", local.lbundle.cdp_interface_policy)
           copp_interface_policy = lookup(v, "copp_interface_policy", local.lbundle.copp_interface_policy)
           data_plane_policing_egress = lookup(
@@ -442,7 +442,7 @@ locals {
   switches_leaf_policy_groups = {
     for k, v in lookup(local.sw_pgs_leaf, "policy_groups", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.swpgl.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       bfd_ipv4_policy          = lookup(v, "bfd_ipv4_policy", local.swpgl.bfd_ipv4_policy)
       bfd_ipv6_policy          = lookup(v, "bfd_ipv6_policy", local.swpgl.bfd_ipv6_policy)
       bfd_multihop_ipv4_policy = lookup(v, "bfd_multihop_ipv4_policy", local.swpgl.bfd_multihop_ipv4_policy)
@@ -482,7 +482,7 @@ locals {
     for k, v in lookup(local.intf_pg_spine, "bundle", {}) : v.name => {
       attachable_entity_profile = lookup(v, "attachable_entity_profile", local.saccess.attachable_entity_profile)
       annotation = coalesce(lookup(v, "annotation", local.saccess.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       cdp_interface_policy = lookup(v, "cdp_interface_policy", local.saccess.cdp_interface_policy)
       description          = lookup(v, "description", local.saccess.description)
       global_alias         = lookup(v, "global_alias", local.saccess.global_alias)
@@ -499,7 +499,7 @@ locals {
   switches_spine_policy_groups = {
     for k, v in lookup(local.sw_pgs_spine, "policy_groups", {}) : v.name => {
       annotation = coalesce(lookup(v, "annotation", local.swpgs.annotation
-      ), local.defaults.annotation)
+      ), var.annotation)
       bfd_ipv4_policy          = lookup(v, "bfd_ipv4_policy", local.swpgs.bfd_ipv4_policy)
       bfd_ipv6_policy          = lookup(v, "bfd_ipv6_policy", local.swpgs.bfd_ipv6_policy)
       cdp_interface_policy     = lookup(v, "cdp_interface_policy", local.swpgs.cdp_interface_policy)
@@ -523,7 +523,7 @@ locals {
     for k, v in lookup(local.pools, "vlan", {}) : v.name => {
       allocation_mode = lookup(v, "allocation_mode", local.vlan.allocation_mode)
       annotation = coalesce(lookup(v, "annotation", local.vlan.annotation)
-      , local.defaults.annotation)
+      , var.annotation)
       description  = lookup(v, "description", local.vlan.description)
       encap_blocks = lookup(v, "encap_blocks", [])
       name         = v.name
@@ -578,7 +578,7 @@ locals {
         for v in value.domain : {
           access_mode = lookup(v, "access_mode", local.vmm.domain.access_mode)
           annotation = coalesce(lookup(v, "annotation", local.vmm.domain.annotation
-          ), local.defaults.annotation)
+          ), var.annotation)
           control_knob          = lookup(v, "control_knob", local.vmm.domain.control_knob)
           delimiter             = lookup(v, "delimiter", local.vmm.domain.delimiter)
           dvs                   = value.virtual_switch_name
@@ -618,13 +618,13 @@ locals {
       for value in lookup(var.model, "virtual_networking", []) : [
         for v in value.controllers : {
           annotation = coalesce(lookup(v, "annotation", local.vmm.controllers.annotation
-          ), local.defaults.annotation)
+          ), var.annotation)
           datacenter     = lookup(v, "datacenter", local.vmm.controllers.datacenter)
           dvs            = value.virtual_switch_name
           dvs_version    = lookup(v, "dvs_version", local.vmm.controllers.dvs_version)
           hostname       = lookup(v, "hostname", local.vmm.controllers.hostname)
           management_epg = lookup(v, "management_epg", local.vmm.controllers.management_epg)
-          mgmt_epg_type = local.defaults.management_epgs[index(local.defaults.management_epgs.*.name,
+          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
             lookup(v, "management_epg", local.vmm.controllers.management_epg))
           ].type
           monitoring_policy = lookup(v, "monitoring_policy", local.vmm.controllers.monitoring_policy)
@@ -646,7 +646,7 @@ locals {
       for key, value in lookup(var.model, "virtual_networking", []) : [
         for k, v in value.vswitch_policy : {
           annotation = coalesce(lookup(v, "annotation", local.vmm.vswitch_policy.annotation
-          ), local.defaults.annotation)
+          ), var.annotation)
           cdp_interface_policy = lookup(v, "cdp_interface_policy", "")
           dvs                  = value.virtual_switch_name
           enhanced_lag_policy = length(compact(
