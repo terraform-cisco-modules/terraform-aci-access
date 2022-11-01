@@ -32,11 +32,7 @@ A comprehensive example using this module is available here: https://github.com/
 | <a name="input_controller_type"></a> [controller\_type](#input\_controller\_type) | The Type of Controller for this Site.<br>- apic<br>- ndo | `string` | `"apic"` | no |
 | <a name="input_management_epgs"></a> [management\_epgs](#input\_management\_epgs) | The Management EPG's that will be used by the script.<br>- name: Name of the EPG<br>- type: Type of EPG<br>  * inb<br>  * oob | <pre>list(object(<br>    {<br>      name = string<br>      type = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "name": "default",<br>    "type": "oob"<br>  }<br>]</pre> | no |
 | <a name="input_mcp_instance_key"></a> [mcp\_instance\_key](#input\_mcp\_instance\_key) | The key or password to uniquely identify the MCP packets within this fabric. | `string` | n/a | yes |
-| <a name="input_vmm_password_1"></a> [vmm\_password\_1](#input\_vmm\_password\_1) | Password for VMM Credentials Policy. | `string` | `""` | no |
-| <a name="input_vmm_password_2"></a> [vmm\_password\_2](#input\_vmm\_password\_2) | Password for VMM Credentials Policy. | `string` | `""` | no |
-| <a name="input_vmm_password_3"></a> [vmm\_password\_3](#input\_vmm\_password\_3) | Password for VMM Credentials Policy. | `string` | `""` | no |
-| <a name="input_vmm_password_4"></a> [vmm\_password\_4](#input\_vmm\_password\_4) | Password for VMM Credentials Policy. | `string` | `""` | no |
-| <a name="input_vmm_password_5"></a> [vmm\_password\_5](#input\_vmm\_password\_5) | Password for VMM Credentials Policy. | `string` | `""` | no |
+| <a name="input_vmm_password"></a> [vmm\_password](#input\_vmm\_password) | Password for VMM Credentials Policy. | `string` | `""` | no |
 ## Outputs
 
 | Name | Description |

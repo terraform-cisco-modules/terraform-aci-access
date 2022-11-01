@@ -72,16 +72,8 @@ resource "aci_vmm_credential" "credentials" {
   description   = each.value.description
   name          = each.value.dvs
   vmm_domain_dn = aci_vmm_domain.vmm_domains[each.value.dvs].id
-  pwd = length(regexall(
-    5, each.value.password)
-    ) > 0 ? var.vmm_password_5 : length(regexall(
-    4, each.value.password)
-    ) > 0 ? var.vmm_password_4 : length(regexall(
-    3, each.value.password)
-    ) > 0 ? var.vmm_password_3 : length(regexall(
-    2, each.value.password)
-  ) > 0 ? var.vmm_password_2 : var.vmm_password_1
-  usr = each.value.username
+  pwd           = var.vmm_password
+  usr           = each.value.username
 }
 
 /*_____________________________________________________________________________________________________________________

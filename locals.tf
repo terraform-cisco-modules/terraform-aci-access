@@ -4,15 +4,16 @@ locals {
   # Model Inputs
   #__________________________________________________________
 
-  access        = lookup(var.model, "access", {})
-  defaults      = lookup(var.model, "defaults", {})
-  domains       = lookup(local.access, "physical_and_external_domains", {})
-  global        = lookup(lookup(local.access, "policies", {}), "global", {})
-  interface     = lookup(lookup(local.access, "policies", {}), "interface", {})
-  intf_pg_leaf  = lookup(lookup(lookup(local.access, "interfaces", {}), "leaf", {}), "policy_groups")
-  intf_pg_spine = lookup(lookup(local.access, "interfaces", {}), "spine", {})
-  pools         = lookup(local.access, "pools", {})
-  pre_built     = local.defaults.access.pre_built_interface_policies
+  access             = lookup(var.model, "access", {})
+  defaults           = lookup(var.model, "defaults", {})
+  domains            = lookup(local.access, "physical_and_external_domains", {})
+  global             = lookup(lookup(local.access, "policies", {}), "global", {})
+  interface          = lookup(lookup(local.access, "policies", {}), "interface", {})
+  intf_pg_leaf       = lookup(lookup(lookup(local.access, "interfaces", {}), "leaf", {}), "policy_groups")
+  intf_pg_spine      = lookup(lookup(local.access, "interfaces", {}), "spine", {})
+  pools              = lookup(local.access, "pools", {})
+  virtual_networking = lookup(var.model, "virtual_networking", [])
+  pre_built          = local.defaults.access.pre_built_interface_policies
   pre_cfg = lookup(local.interface, "create_pre_built_interface_policies", {
     cdp_interface           = false
     fibre_channel_interface = false
@@ -574,14 +575,14 @@ locals {
 
   vmm_domains = {
     for i in flatten([
-      for value in lookup(var.model, "virtual_networking", []) : [
+      for value in lookup(local.virtual_networking, "vmm", []) : [
         for v in value.domain : {
           access_mode = lookup(v, "access_mode", local.vmm.domain.access_mode)
           annotation = coalesce(lookup(v, "annotation", local.vmm.domain.annotation
           ), var.annotation)
           control_knob          = lookup(v, "control_knob", local.vmm.domain.control_knob)
           delimiter             = lookup(v, "delimiter", local.vmm.domain.delimiter)
-          dvs                   = value.virtual_switch_name
+          dvs                   = value.name
           enable_tag_collection = lookup(v, "enable_tag_collection", local.vmm.domain.enable_tag_collection)
           enable_vm_folder_data_retrieval = lookup(
             v, "enable_vm_folder_data_retrieval", local.vmm.domain.enable_vm_folder_data_retrieval
@@ -594,7 +595,7 @@ locals {
           preferred_encapsulation = lookup(v, "preferred_encapsulation", local.vmm.domain.preferred_encapsulation)
           switch_provider         = lookup(v, "switch_provider", local.vmm.domain.switch_provider)
           switch_mode             = lookup(v, "switch_mode", local.vmm.domain.switch_mode)
-          uplink_names            = length(lookup(v, "uplink_names", local.vmm.domain.uplink_names)) > 0 ? v.uplink_names : ["uplink1", "uplink2"]
+          uplink_names            = lookup(v, "uplink_names", local.vmm.domain.uplink_names)
           vlan_pool               = v.vlan_pool
         }
       ]
@@ -602,12 +603,11 @@ locals {
   }
   vmm_credentials = {
     for i in flatten([
-      for value in lookup(var.model, "virtual_networking", []) : [
+      for value in lookup(local.virtual_networking, "vmm", []) : [
         for k, v in value.credentials : {
-          annotation  = local.vmm_domains["${value.virtual_switch_name}"].annotation
-          dvs         = value.virtual_switch_name
+          annotation  = local.vmm_domains["${value.name}"].annotation
+          dvs         = value.name
           description = lookup(v, "description", local.vmm.credentials.description)
-          password    = v.password
           username    = v.username
         }
       ]
@@ -615,12 +615,12 @@ locals {
   }
   vmm_controllers = {
     for i in flatten([
-      for value in lookup(var.model, "virtual_networking", []) : [
+      for value in lookup(local.virtual_networking, "vmm", []) : [
         for v in value.controllers : {
           annotation = coalesce(lookup(v, "annotation", local.vmm.controllers.annotation
           ), var.annotation)
           datacenter     = lookup(v, "datacenter", local.vmm.controllers.datacenter)
-          dvs            = value.virtual_switch_name
+          dvs            = value.name
           dvs_version    = lookup(v, "dvs_version", local.vmm.controllers.dvs_version)
           hostname       = lookup(v, "hostname", local.vmm.controllers.hostname)
           management_epg = lookup(v, "management_epg", local.vmm.controllers.management_epg)
@@ -643,12 +643,12 @@ locals {
   }
   vswitch_policies = {
     for i in flatten([
-      for key, value in lookup(var.model, "virtual_networking", []) : [
+      for key, value in lookup(local.virtual_networking, "vmm", []) : [
         for k, v in value.vswitch_policy : {
           annotation = coalesce(lookup(v, "annotation", local.vmm.vswitch_policy.annotation
           ), var.annotation)
           cdp_interface_policy = lookup(v, "cdp_interface_policy", "")
-          dvs                  = value.virtual_switch_name
+          dvs                  = value.name
           enhanced_lag_policy = length(compact(
             [lookup(lookup(v, "enhanced_lag_policy", {}), "name", "")])
             ) > 0 ? {

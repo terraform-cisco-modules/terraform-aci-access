@@ -95,35 +95,7 @@ variable "mcp_instance_key" {
 Virtual Networking > {switch_provider} > {domain_name} > Credentials — Sensitive Variables
 _______________________________________________________________________________________________________________________
 */
-variable "vmm_password_1" {
-  default     = ""
-  description = "Password for VMM Credentials Policy."
-  sensitive   = true
-  type        = string
-}
-
-variable "vmm_password_2" {
-  default     = ""
-  description = "Password for VMM Credentials Policy."
-  sensitive   = true
-  type        = string
-}
-
-variable "vmm_password_3" {
-  default     = ""
-  description = "Password for VMM Credentials Policy."
-  sensitive   = true
-  type        = string
-}
-
-variable "vmm_password_4" {
-  default     = ""
-  description = "Password for VMM Credentials Policy."
-  sensitive   = true
-  type        = string
-}
-
-variable "vmm_password_5" {
+variable "vmm_password" {
   default     = ""
   description = "Password for VMM Credentials Policy."
   sensitive   = true
