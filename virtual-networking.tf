@@ -8,9 +8,9 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_vmm_domain" "vmm_domains" {
-  # depends_on = [
-  #   aci_vlan_pool.pools_vlan
-  # ]
+  depends_on = [
+    aci_vlan_pool.vlan_pools
+  ]
   for_each            = local.vmm_domains
   access_mode         = each.value.access_mode
   annotation          = each.value.annotation
@@ -25,8 +25,8 @@ resource "aci_vmm_domain" "vmm_domains" {
   name                = each.key
   pref_encap_mode     = each.value.preferred_encapsulation
   provider_profile_dn = "uni/vmmp-${each.value.switch_provider}"
-  # relation_infra_rs_vlan_ns = length(compact([each.value.vlan_pool])
-  # ) > 0 ? aci_vlan_pool.pools_vlan[each.value.vlan_pool].id : ""
+  relation_infra_rs_vlan_ns = length(compact([each.value.vlan_pool])
+  ) > 0 ? aci_vlan_pool.vlan_pools[each.value.vlan_pool].id : ""
 }
 
 resource "aci_rest_managed" "vmm_domain_uplinks" {

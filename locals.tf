@@ -399,10 +399,9 @@ locals {
           fibre_channel_interface_policy = lookup(
             v, "fibre_channel_interface_policy", local.lbundle.fibre_channel_interface_policy
           )
-          l2_interface_policy     = lookup(v, "l2_interface_policy", local.lbundle.l2_interface_policy)
-          link_aggregation_policy = lookup(v, "link_aggregation_policy", local.lbundle.link_aggregation_policy)
-          link_aggregation_type   = lookup(v, "link_aggregation_type", local.lbundle.link_aggregation_type)
-          link_flap_policy        = lookup(v, "link_flap_policy", local.lbundle.link_flap_policy)
+          l2_interface_policy   = lookup(v, "l2_interface_policy", local.lbundle.l2_interface_policy)
+          link_aggregation_type = lookup(v, "link_aggregation_type", local.lbundle.link_aggregation_type)
+          link_flap_policy      = lookup(v, "link_flap_policy", local.lbundle.link_flap_policy)
           link_level_flow_control_policy = lookup(
             v, "link_level_flow_control_policy", local.lbundle.link_level_flow_control_policy
           )
@@ -418,6 +417,7 @@ locals {
               netflow_monitor_policy = s.netflow_monitor_policy
             }
           ]
+          port_channel_policy  = lookup(v, "port_channel_policy", local.lbundle.port_channel_policy)
           port_security_policy = lookup(v, "port_security_policy", local.lbundle.port_security_policy)
           priority_flow_control_policy = lookup(
             v, "priority_flow_control_policy", local.lbundle.priority_flow_control_policy
@@ -687,7 +687,7 @@ locals {
         access_mode     = v.access_mode
         dvs             = k
         switch_provider = v.switch_provider
-        uplinkId        = s
+        uplinkId        = s + 1
         uplinkName      = element(v.uplink_names, s)
       }
     ]

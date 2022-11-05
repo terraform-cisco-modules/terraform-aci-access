@@ -27,6 +27,17 @@ LLDP Policy
 _______________________________________________________________________________________________________________________
 */
 resource "aci_spine_switch_policy_group" "switches_spine_policy_groups" {
+  depends_on = [
+    aci_cdp_interface_policy.cdp_interface,
+    aci_interface_fc_policy.fibre_channel_interface,
+    aci_l2_interface_policy.l2_interface,
+    aci_fabric_if_pol.link_level,
+    aci_lldp_interface_policy.lldp_interface,
+    aci_miscabling_protocol_interface_policy.mcp_interface,
+    aci_lacp_policy.port_channel,
+    aci_port_security_policy.port_security,
+    aci_spanning_tree_interface_policy.spanning_tree_interface
+  ]
   for_each    = local.switches_spine_policy_groups
   annotation  = each.value.annotation
   description = each.value.description

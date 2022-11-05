@@ -190,8 +190,8 @@ resource "aci_leaf_access_bundle_policy_group" "leaf_interfaces_policy_groups_bu
   relation_infra_rs_l2_port_security_pol = length(compact([each.value.port_security_policy])
   ) > 0 ? "uni/infra/portsecurityP-${each.value.port_security_policy}" : ""
   # class: lacpLagPol
-  relation_infra_rs_lacp_pol = length(compact([each.value.link_aggregation_policy])
-  ) > 0 ? "uni/infra/lacplagp-${each.value.link_aggregation_policy}" : ""
+  relation_infra_rs_lacp_pol = length(compact([each.value.port_channel_policy])
+  ) > 0 ? "uni/infra/lacplagp-${each.value.port_channel_policy}" : ""
   # class: lldpIfPol
   relation_infra_rs_lldp_if_pol = length(compact([each.value.lldp_interface_policy])
   ) > 0 ? "uni/infra/lldpIfP-${each.value.lldp_interface_policy}" : ""
