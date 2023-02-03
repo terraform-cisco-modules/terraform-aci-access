@@ -135,55 +135,55 @@ locals {
   }
 
   #===================================
-  # Global - CDP
+  # Merge - CDP
   #===================================
   cdp_pre_built = local.pre_cfg.cdp_interface == true ? local.pre_built.cdp_interface : []
   cdp_user      = lookup(local.interface, "cdp_interface", [])
   cdp_policies  = concat(local.cdp_pre_built, local.cdp_user)
   #===================================
-  # Global - Fibre-Channel Interface
+  # Merge - Fibre-Channel Interface
   #===================================
   fc_pre_built = local.pre_cfg.fibre_channel_interface == true ? local.pre_built.fibre_channel_interface : []
   fc_user      = lookup(local.interface, "fibre_channel_interface", [])
   fc_policies  = concat(local.fc_pre_built, local.fc_user)
   #===================================
-  # Global - L2 Interface 
+  # Merge - L2 Interface 
   #===================================
   l2_pre_built = local.pre_cfg.l2_interface == true ? local.pre_built.l2_interface : []
   l2_user      = lookup(local.interface, "l2_interface", [])
   l2_policies  = concat(local.l2_pre_built, local.l2_user)
   #===================================
-  # Global - Link Level
+  # Merge - Link Level
   #===================================
   ll_pre_built = local.pre_cfg.link_level == true ? local.pre_built.link_level : []
   ll_user      = lookup(local.interface, "link_level", [])
   ll_policies  = concat(local.ll_pre_built, local.ll_user)
   #===================================
-  # Global - LLDP
+  # Merge - LLDP
   #===================================
   lldp_pre_built = local.pre_cfg.lldp_interface == true ? local.pre_built.lldp_interface : []
   lldp_user      = lookup(local.interface, "lldp_interface", [])
   lldp_policies  = concat(local.lldp_pre_built, local.lldp_user)
   #===================================
-  # Global - Mis-Cabling Protocol
+  # Merge - Mis-Cabling Protocol
   #===================================
   mcp_pre_built = local.pre_cfg.mcp_interface == true ? local.pre_built.mcp_interface : []
   mcp_user      = lookup(local.interface, "mcp_interface", [])
   mcp_policies  = concat(local.mcp_pre_built, local.mcp_user)
   #===================================
-  # Global - Port-Channel
+  # Merge - Port-Channel
   #===================================
   pc_pre_built = local.pre_cfg.port_channel == true ? local.pre_built.port_channel : []
   pc_user      = lookup(local.interface, "port_channel", [])
   pc_policies  = concat(local.pc_pre_built, local.pc_user)
   #===================================
-  # Global - Port Security
+  # Merge - Port Security
   #===================================
   ps_pre_built = local.pre_cfg.port_security == true ? local.pre_built.port_security : []
   ps_user      = lookup(local.interface, "port_security", [])
   ps_policies  = concat(local.ps_pre_built, local.ps_user)
   #===================================
-  # Global - Spanning-tree Protocol
+  # Merge - Spanning-tree Protocol
   #===================================
   stp_pre_built = local.pre_cfg.spanning_tree_interface == true ? local.pre_built.spanning_tree_interface : []
   stp_user      = lookup(local.interface, "spanning_tree_interface", [])
@@ -193,9 +193,9 @@ locals {
   # Interface Policies Variables
   #__________________________________________________________
 
-  #=========================
-  # CDP Interface
-  #=========================
+  #===================================
+  # Global - CDP Interface
+  #===================================
 
   cdp_interface = {
     for k, v in local.cdp_policies : v.name => {
@@ -206,9 +206,9 @@ locals {
     }
   }
 
-  #=========================
-  # Fibre-Channel Interface
-  #=========================
+  #===================================
+  # Global - Fibre-Channel Interface
+  #===================================
 
   fibre_channel_interface = {
     for k, v in local.fc_policies : v.name => {
@@ -223,9 +223,9 @@ locals {
     }
   }
 
-  #=========================
-  # L2 Interface
-  #=========================
+  #===================================
+  # Global - L2 Interface
+  #===================================
 
   l2_interface = {
     for k, v in local.l2_policies : v.name => {
@@ -237,9 +237,9 @@ locals {
     }
   }
 
-  #=========================
-  # Link-Level
-  #=========================
+  #===================================
+  # Global - Link-Level
+  #===================================
 
   link_level = {
     for k, v in local.ll_policies : v.name => {
@@ -253,9 +253,9 @@ locals {
     }
   }
 
-  #=========================
-  # LLDP Interface
-  #=========================
+  #===================================
+  # Global - LLDP Interface
+  #===================================
 
   lldp_interface = {
     for k, v in local.lldp_policies : v.name => {
@@ -267,9 +267,9 @@ locals {
     }
   }
 
-  #=========================
-  # MCP Interface
-  #=========================
+  #===================================
+  # Global - MCP Interface
+  #===================================
 
   mcp_interface = {
     for k, v in local.mcp_policies : v.name => {
@@ -279,9 +279,9 @@ locals {
     }
   }
 
-  #=========================
-  # Port-Channel
-  #=========================
+  #===================================
+  # Global - Port-Channel
+  #===================================
 
   port_channel = {
     for k, v in local.pc_policies : v.name => {
@@ -311,9 +311,9 @@ locals {
     }
   }
 
-  #=========================
-  # Port Security
-  #=========================
+  #===================================
+  # Global - Port Security
+  #===================================
 
   port_security = {
     for k, v in local.ps_policies : v.name => {
@@ -324,9 +324,9 @@ locals {
     }
   }
 
-  #=========================
-  # Spanning-Tree Interface
-  #=========================
+  #===================================
+  # Global - Spanning-Tree Interface
+  #===================================
 
   spanning_tree_interface = {
     for k, v in local.stp_policies : v.name => {

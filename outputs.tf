@@ -29,8 +29,8 @@ output "attachable_access_entity_profiles" {
 
 output "dhcp_relay" {
   value = local.dhcp_relay != {} ? { for v in sort(
-    keys(aci_rest_managed.dhcp_relay)
-  ) : v => aci_rest_managed.dhcp_relay[v].id } : {}
+    keys(aci_dhcp_relay_policy.dhcp_relay)
+  ) : v => aci_dhcp_relay_policy.dhcp_relay[v].id } : {}
 }
 
 output "error_disabled_recovery_policy" {
