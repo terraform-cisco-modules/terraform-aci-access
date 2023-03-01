@@ -31,8 +31,8 @@ locals {
     qos_class               = false
     vpc_domain              = false
   })
-  sw_pgs_leaf  = lookup(lookup(var.model, "access", {}), "switches", {})
-  sw_pgs_spine = lookup(lookup(var.model, "access", {}), "switches", {})
+  sw_pgs_leaf  = lookup(lookup(lookup(var.model, "access", {}), "switches", {}), "leaf", {})
+  sw_pgs_spine = lookup(lookup(lookup(var.model, "access", {}), "switches", {}), "spine", {})
   # Defaults: Domains
   l3   = local.defaults.access.physical_and_external_domains.l3_domains
   phys = local.defaults.access.physical_and_external_domains.physical_domains
