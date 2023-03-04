@@ -58,7 +58,7 @@ resource "aci_dhcp_relay_policy" "dhcp_relay" {
   tenant_dn   = "uni/infra"
   relation_dhcp_rs_prov {
     addr = each.value.address
-    tDn = length(
+    tdn = length(
       regexall("external_epg", each.value.epg_type)
       ) > 0 ? "uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}" : length(
       regexall("application_epg", each.value.epg_type)
