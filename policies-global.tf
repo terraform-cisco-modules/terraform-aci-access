@@ -48,23 +48,51 @@ GUI Location:
  - Fabric > Access Policies > Policies > Global > DHCP Relay > {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_dhcp_relay_policy" "dhcp_relay" {
-  for_each    = local.dhcp_relay
-  annotation  = each.value.annotation
-  description = each.value.description
-  mode        = each.value.mode
-  name        = each.key
-  owner       = "infra"
-  tenant_dn   = "uni/infra"
-  relation_dhcp_rs_prov {
-    addr = each.value.address
-    tdn = length(
+resource "aci_rest_managed" "dhcp_relay" {
+  for_each   = local.dhcp_relay
+  class_name = "dhcpRelayP"
+  dn         = "uni/infra/relayp-${each.key}"
+  content = {
+    # annotation = each.value.annotation
+    descr = each.value.description
+    mode  = each.value.mode
+    name  = each.key
+    owner = "infra"
+  }
+  child {
+    rn = length(
       regexall("external_epg", each.value.epg_type)
-      ) > 0 ? "uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}" : length(
+      ) > 0 ? "rsprov-[uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}]" : length(
       regexall("application_epg", each.value.epg_type)
-    ) > 0 ? "uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}" : ""
+    ) > 0 ? "rsprov-[uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}]" : ""
+    class_name = "dhcpRsProv"
+    content = {
+      addr = each.value.address
+      tDn = length(
+        regexall("external_epg", each.value.epg_type)
+        ) > 0 ? "uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}" : length(
+        regexall("application_epg", each.value.epg_type)
+      ) > 0 ? "uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}" : ""
+    }
   }
 }
+#resource "aci_dhcp_relay_policy" "dhcp_relay" {
+#  for_each    = local.dhcp_relay
+#  annotation  = each.value.annotation
+#  description = each.value.description
+#  mode        = each.value.mode
+#  name        = each.key
+#  owner       = "infra"
+#  tenant_dn   = "uni/infra"
+#  relation_dhcp_rs_prov {
+#    addr = each.value.address
+#    tdn = length(
+#      regexall("external_epg", each.value.epg_type)
+#      ) > 0 ? "uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}" : length(
+#      regexall("application_epg", each.value.epg_type)
+#    ) > 0 ? "uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}" : ""
+#  }
+#}
 
 /*_____________________________________________________________________________________________________________________
 
