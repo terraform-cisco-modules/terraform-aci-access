@@ -374,7 +374,7 @@ locals {
       monitoring_policy     = lookup(v, "monitoring_policy", local.laccess.monitoring_policy)
       netflow_monitor_policies = [
         for s in lookup(v, "netflow_monitor_policies", []) : {
-          ip_filter_type         = lookup(s, "ip_filter_type", local.laccess.ip_filter_type)
+          ip_filter_type         = lookup(s, "ip_filter_type", local.laccess.netflow_monitor_policies.ip_filter_type)
           netflow_monitor_policy = s.netflow_monitor_policy
         }
       ]
@@ -437,7 +437,7 @@ locals {
           name                  = s
           netflow_monitor_policies = [
             for s in lookup(v, "netflow_monitor_policies", []) : {
-              ip_filter_type         = lookup(s, "ip_filter_type", local.laccess.ip_filter_type)
+              ip_filter_type         = lookup(s, "ip_filter_type", local.lbundle.netflow_monitor_policies.ip_filter_type)
               netflow_monitor_policy = s.netflow_monitor_policy
             }
           ]
