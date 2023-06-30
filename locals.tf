@@ -114,11 +114,10 @@ locals {
   #===================================
   # Global - DHCP Relay
   #===================================
-  dhcp_relay = {
-    for i in flatten([
+  dhcp_relay = {    for i in flatten([
       for k, v in lookup(local.global, "dhcp_relay", []) : [
-        for s in range(length([for a in v.name_addr_list : a[0]])) : {
-          address = element(element(v.name_addr_list, s), 1)
+        for s in v.dhcp_servers : {
+          address = s
           annotation = coalesce(lookup(v, "annotation", local.dhcp.annotation
           ), var.annotation)
           application_profile = lookup(v, "application_profile", local.dhcp.application_profile)
@@ -127,12 +126,11 @@ locals {
           epg_type            = lookup(v, "epg_type", local.dhcp.epg_type)
           l3out               = lookup(v, "l3out", local.dhcp.l3out)
           mode                = lookup(v, "mode", local.dhcp.mode)
-          name                = element(element(v.name_addr_list, s), 0)
+          name                = s
           tenant              = lookup(v, "tenant", local.dhcp.tenant)
         }
       ]
-    ]) : i.name => i
-  }
+    ]) : i.name => i  }
 
   #===================================
   # Merge - CDP

@@ -15,12 +15,12 @@ A comprehensive example using this module is available here: https://github.com/
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.6.0 |
+| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.8.0 |
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.6.0 |
+| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.8.0 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -37,30 +37,27 @@ A comprehensive example using this module is available here: https://github.com/
 
 | Name | Description |
 |------|-------------|
-| <a name="output_l3_domains"></a> [l3\_domains](#output\_l3\_domains) | n/a |
-| <a name="output_physical_domains"></a> [physical\_domains](#output\_physical\_domains) | n/a |
-| <a name="output_attachable_access_entity_profiles"></a> [attachable\_access\_entity\_profiles](#output\_attachable\_access\_entity\_profiles) | n/a |
-| <a name="output_dhcp_relay"></a> [dhcp\_relay](#output\_dhcp\_relay) | n/a |
-| <a name="output_error_disabled_recovery_policy"></a> [error\_disabled\_recovery\_policy](#output\_error\_disabled\_recovery\_policy) | n/a |
-| <a name="output_mcp_instance_policy"></a> [mcp\_instance\_policy](#output\_mcp\_instance\_policy) | n/a |
-| <a name="output_qos_class"></a> [qos\_class](#output\_qos\_class) | n/a |
-| <a name="output_leaf_interfaces_policy_groups_access"></a> [leaf\_interfaces\_policy\_groups\_access](#output\_leaf\_interfaces\_policy\_groups\_access) | n/a |
-| <a name="output_leaf_interfaces_policy_groups_breakout"></a> [leaf\_interfaces\_policy\_groups\_breakout](#output\_leaf\_interfaces\_policy\_groups\_breakout) | n/a |
-| <a name="output_leaf_interfaces_policy_groups_bundle"></a> [leaf\_interfaces\_policy\_groups\_bundle](#output\_leaf\_interfaces\_policy\_groups\_bundle) | n/a |
-| <a name="output_cdp_interface"></a> [cdp\_interface](#output\_cdp\_interface) | n/a |
-| <a name="output_fibre_channel_interface"></a> [fibre\_channel\_interface](#output\_fibre\_channel\_interface) | n/a |
-| <a name="output_l2_interface"></a> [l2\_interface](#output\_l2\_interface) | n/a |
-| <a name="output_link_level"></a> [link\_level](#output\_link\_level) | n/a |
-| <a name="output_lldp_interface"></a> [lldp\_interface](#output\_lldp\_interface) | n/a |
-| <a name="output_mcp_interface"></a> [mcp\_interface](#output\_mcp\_interface) | n/a |
-| <a name="output_port_channel"></a> [port\_channel](#output\_port\_channel) | n/a |
-| <a name="output_port_security"></a> [port\_security](#output\_port\_security) | n/a |
-| <a name="output_spanning_tree_interface"></a> [spanning\_tree\_interface](#output\_spanning\_tree\_interface) | n/a |
-| <a name="output_vlan_pools"></a> [vlan\_pools](#output\_vlan\_pools) | n/a |
-| <a name="output_spine_interface_policy_groups"></a> [spine\_interface\_policy\_groups](#output\_spine\_interface\_policy\_groups) | n/a |
-| <a name="output_switches_leaf_policy_groups"></a> [switches\_leaf\_policy\_groups](#output\_switches\_leaf\_policy\_groups) | n/a |
-| <a name="output_switches_spine_policy_groups"></a> [switches\_spine\_policy\_groups](#output\_switches\_spine\_policy\_groups) | n/a |
-| <a name="output_vmm_domains"></a> [vmm\_domains](#output\_vmm\_domains) | n/a |
+| <a name="output_interface-leaf-leaf_interfaces-policy_groups"></a> [interface-leaf-leaf\_interfaces-policy\_groups](#output\_interface-leaf-leaf\_interfaces-policy\_groups) | * access - Identifiers for Access Policy Groups.  Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => Leaf Access Port.<br>* breakout - Identifiers for Breakout Policy Groups.  Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => Leaf Breakout Port Group.<br>* bundle - Identifiers for Bundle Policy Groups.  Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => [ VPC Interface \| VPC Interface ]. |
+| <a name="output_interface-interfaces-spine_interface-policy_groups"></a> [interface-interfaces-spine\_interface-policy\_groups](#output\_interface-interfaces-spine\_interface-policy\_groups) | Identifiers for Spine Interface Policy Groups.  Fabric => Access Policies => Interfaces => Spine Interfaces => Policy Groups. |
+| <a name="output_physical_and_external_domains"></a> [physical\_and\_external\_domains](#output\_physical\_and\_external\_domains) | * l3\_domains - Identifiers for L3 Domains.  Fabric => Access Policies => Physical and External Domains => L3 Domains.<br>* physical\_domains - Identifiers for Physical Domains.  Fabric => Access Policies => Physical and External Domains => Physical Domains. |
+| <a name="output_policies-global-attachable_access_entity_profiles"></a> [policies-global-attachable\_access\_entity\_profiles](#output\_policies-global-attachable\_access\_entity\_profiles) | Identifiers for AAEPs.  Fabric => Access Policies => Policies => Global => Attachable Access Entity Profiles. |
+| <a name="output_policies-global-dhcp_relay"></a> [policies-global-dhcp\_relay](#output\_policies-global-dhcp\_relay) | Identifiers for DHCP Relay.  Fabric => Access Policies => Policies => Global => DHCP Relay. |
+| <a name="output_policies-global-error_disabled_recovery_policy"></a> [policies-global-error\_disabled\_recovery\_policy](#output\_policies-global-error\_disabled\_recovery\_policy) | Identifiers for Error Disabled Recovery.  Fabric => Access Policies => Policies => Global => Error Disabled Recovery Profiles. |
+| <a name="output_policies-global-mcp_instance_policy"></a> [policies-global-mcp\_instance\_policy](#output\_policies-global-mcp\_instance\_policy) | Identifiers for MCP Instance Policy.  Fabric => Access Policies => Policies => Global => MCP Instance Policy - default. |
+| <a name="output_policies-global-qos_class"></a> [policies-global-qos\_class](#output\_policies-global-qos\_class) | Identifiers for QoS Class.  Fabric => Access Policies => Policies => Global => QoS Class. |
+| <a name="output_policies-interface-cdp_interface"></a> [policies-interface-cdp\_interface](#output\_policies-interface-cdp\_interface) | Identifiers for CDP Interface Policies.  Fabric => Access Policies => Policies => Interfaces => CDP Interface. |
+| <a name="output_policies-interface-fibre_channel_interface"></a> [policies-interface-fibre\_channel\_interface](#output\_policies-interface-fibre\_channel\_interface) | Identifiers for Fibre Channel Interface Policies.  Fabric => Access Policies => Policies => Interfaces => Fibre Channel Interface. |
+| <a name="output_policies-interface-l2_interface"></a> [policies-interface-l2\_interface](#output\_policies-interface-l2\_interface) | Identifiers for L2 Interface Policies.  Fabric => Access Policies => Policies => Interfaces => L2 Interface. |
+| <a name="output_policies-interface-link_level"></a> [policies-interface-link\_level](#output\_policies-interface-link\_level) | Identifiers for Link Level Policies.  Fabric => Access Policies => Policies => Interfaces => Link Level. |
+| <a name="output_policies-interface-lldp_interface"></a> [policies-interface-lldp\_interface](#output\_policies-interface-lldp\_interface) | Identifiers for LLDP Interface Policies.  Fabric => Access Policies => Policies => Interfaces => LLDP Interface. |
+| <a name="output_policies-interface-mcp_interface"></a> [policies-interface-mcp\_interface](#output\_policies-interface-mcp\_interface) | Identifiers for MCP Interface Policies.  Fabric => Access Policies => Policies => Interfaces => MCP Interface. |
+| <a name="output_policies-interface-port_channel"></a> [policies-interface-port\_channel](#output\_policies-interface-port\_channel) | Identifiers for Port Channel Policies.  Fabric => Access Policies => Policies => Interfaces => Port Channel. |
+| <a name="output_policies-interface-port_security"></a> [policies-interface-port\_security](#output\_policies-interface-port\_security) | Identifiers for Port Security Policies.  Fabric => Access Policies => Policies => Interfaces => Port Security. |
+| <a name="output_policies-interface-spanning_tree_interface"></a> [policies-interface-spanning\_tree\_interface](#output\_policies-interface-spanning\_tree\_interface) | Identifiers for Spanning-Tree Interface Policies.  Fabric => Access Policies => Policies => Interfaces => Spanning-Tree Interface. |
+| <a name="output_pools-vlan"></a> [pools-vlan](#output\_pools-vlan) | Identifiers for VLAN Pools.  Fabric => Access Policies => Pools => VLAN. |
+| <a name="output_switches-leaf_switches-policy_groups"></a> [switches-leaf\_switches-policy\_groups](#output\_switches-leaf\_switches-policy\_groups) | Identifiers for Leaf Switches Policy Groups.  Fabric => Access Policies => Switches => Leaf Switches => Policy Groups. |
+| <a name="output_switches-spine_switches-policy_groups"></a> [switches-spine\_switches-policy\_groups](#output\_switches-spine\_switches-policy\_groups) | Identifiers for Spine Switches Policy Groups.  Fabric => Access Policies => Switches => Spines Switches => Policy Groups. |
+| <a name="output_virtual_networking-vmm_domains"></a> [virtual\_networking-vmm\_domains](#output\_virtual\_networking-vmm\_domains) | * vmm\_domain - Identifiers for VMM Domains.  Virtual Networking.<br>* vmm\_domain\_controllers - Identifiers for VMM Controllers.  Virtual Networking => {VMM Doamin} => Controllers: {controller\_name}.<br>* vmm\_domain\_credentials - Identifiers for VMM Domain Credentials.  Virtual Networking => {VMM Doamin}: vCenter Credentials.<br>* vmm\_domain\_vswitch\_policies - Identifiers for VMM Domain Virtual Switch Policies.  Virtual Networking => {VMM Doamin}: vSwitch Policy |
 ## Resources
 
 | Name | Type |
