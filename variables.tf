@@ -3,8 +3,8 @@
 # Model Data and policy from domains and pools
 #__________________________________________________________________
 
-variable "model" {
-  description = "Model data."
+variable "access" {
+  description = "Access Model data."
   type        = any
 }
 
@@ -16,18 +16,18 @@ variable "apic_version" {
 }
 
 
+variable "virtual_networking" {
+  description = "Viritual Networking Model data."
+  type        = any
+}
+
+
 /*_____________________________________________________________________________________________________________________
 
 Global Shared Variables
 _______________________________________________________________________________________________________________________
 */
 
-
-variable "annotation" {
-  default     = "orchestrator:terraform:easy-aci-v2.0"
-  description = "The Version of this Script."
-  type        = string
-}
 
 variable "annotations" {
   default = [

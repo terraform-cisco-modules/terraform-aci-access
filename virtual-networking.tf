@@ -13,7 +13,6 @@ resource "aci_vmm_domain" "vmm_domains" {
   ]
   for_each            = local.vmm_domains
   access_mode         = each.value.access_mode
-  annotation          = each.value.annotation
   ctrl_knob           = each.value.control_knob
   delimiter           = each.value.delimiter
   enable_tag          = each.value.enable_tag_collection == true ? "yes" : "no"
@@ -68,7 +67,6 @@ resource "aci_vmm_credential" "credentials" {
     aci_vmm_domain.vmm_domains
   ]
   for_each      = local.vmm_credentials
-  annotation    = each.value.annotation
   description   = each.value.description
   name          = each.value.dvs
   vmm_domain_dn = aci_vmm_domain.vmm_domains[each.value.dvs].id
@@ -93,7 +91,6 @@ resource "aci_vmm_controller" "controllers" {
   for_each            = local.vmm_controllers
   vmm_domain_dn       = aci_vmm_domain.vmm_domains[each.value.dvs].id
   name                = each.value.hostname
-  annotation          = each.value.annotation
   dvs_version         = each.value.dvs_version
   host_or_ip          = each.value.hostname
   inventory_trig_st   = each.value.trigger_inventory_sync
@@ -128,7 +125,6 @@ resource "aci_vswitch_policy" "vswitch_policies" {
   ]
   for_each      = local.vswitch_policies
   vmm_domain_dn = aci_vmm_domain.vmm_domains[each.value.dvs].id
-  annotation    = each.value.annotation
   dynamic "relation_vmm_rs_vswitch_exporter_pol" {
     for_each = { for v in each.value.netflow_export_policy : v.netflow_policy => v }
     content {

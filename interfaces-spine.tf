@@ -14,7 +14,6 @@ resource "aci_spine_port_policy_group" "spine_interface_policy_groups" {
     aci_fabric_if_pol.link_level,
   ]
   for_each    = local.spine_interface_policy_groups
-  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
   # class: infraAttEntityP

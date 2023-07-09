@@ -14,7 +14,6 @@ resource "aci_attachable_access_entity_profile" "attachable_access_entity_profil
     aci_vmm_domain.vmm_domains
   ]
   for_each                = local.attachable_access_entity_profiles
-  annotation              = each.value.annotation
   description             = each.value.description
   name                    = each.key
   relation_infra_rs_dom_p = each.value.domains
@@ -34,7 +33,6 @@ resource "aci_access_generic" "access_generic" {
     aci_attachable_access_entity_profile.attachable_access_entity_profiles
   ]
   for_each                            = local.attachable_access_entity_profiles
-  annotation                          = each.value.annotation
   attachable_access_entity_profile_dn = aci_attachable_access_entity_profile.attachable_access_entity_profiles[each.key].id
   name                                = "default"
 }
@@ -53,7 +51,6 @@ resource "aci_rest_managed" "dhcp_relay" {
   class_name = "dhcpRelayP"
   dn         = "uni/infra/relayp-${each.key}"
   content = {
-    # annotation = each.value.annotation
     descr = each.value.description
     mode  = each.value.mode
     name  = each.key
@@ -78,7 +75,6 @@ resource "aci_rest_managed" "dhcp_relay" {
 }
 #resource "aci_dhcp_relay_policy" "dhcp_relay" {
 #  for_each    = local.dhcp_relay
-#  annotation  = each.value.annotation
 #  description = each.value.description
 #  mode        = each.value.mode
 #  name        = each.key
@@ -107,8 +103,6 @@ resource "aci_error_disable_recovery" "error_disabled_recovery" {
   for_each = {
     for v in toset(["default"]) : "default" => v if local.recommended_settings.error_disabled_recovery == true
   }
-  annotation = length(compact([local.recovery.annotation])
-  ) > 0 ? local.recovery.annotation : local.defaults.annotation
   err_dis_recov_intvl = local.recovery.error_disable_recovery_interval
   edr_event {
     event   = "event-bpduguard"
@@ -137,8 +131,7 @@ resource "aci_mcp_instance_policy" "mcp_instance" {
   for_each = {
     for v in toset(["default"]) : "default" => v if local.recommended_settings.mcp_instance == true
   }
-  admin_st   = local.mcpi.admin_state
-  annotation = coalesce(local.mcpi.annotation, local.defaults.annotation)
+  admin_st = local.mcpi.admin_state
   ctrl = length(regexall(true, local.mcpi.enable_mcp_pdu_per_vlan)
   ) > 0 ? ["pdu-per-vlan", "stateful-ha"] : ["stateful-ha"]
   description      = local.mcpi.description
@@ -164,7 +157,6 @@ resource "aci_qos_instance_policy" "qos_class" {
   for_each = {
     for v in toset(["default"]) : "default" => v if local.recommended_settings.qos_class == true
   }
-  annotation            = coalesce(local.qos.annotation, local.defaults.annotation)
   ctrl                  = local.qos.preserve_cos == true ? "dot1p-preserve" : "none"
   description           = local.qos.description
   etrap_age_timer       = local.qos.elephant_trap_age_period

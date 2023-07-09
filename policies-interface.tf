@@ -9,7 +9,6 @@ ________________________________________________________________________________
 */
 resource "aci_cdp_interface_policy" "cdp_interface" {
   for_each    = local.cdp_interface
-  annotation  = each.value.annotation
   admin_st    = each.value.admin_state
   description = each.value.description
   name        = each.key
@@ -48,7 +47,6 @@ ________________________________________________________________________________
 */
 resource "aci_interface_fc_policy" "fibre_channel_interface" {
   for_each     = local.fibre_channel_interface
-  annotation   = each.value.annotation
   automaxspeed = each.value.auto_max_speed
   description  = each.value.description
   fill_pattern = each.value.fill_pattern
@@ -70,7 +68,6 @@ ________________________________________________________________________________
 */
 resource "aci_l2_interface_policy" "l2_interface" {
   for_each    = local.l2_interface
-  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
   qinq        = each.value.qinq
@@ -89,7 +86,6 @@ ________________________________________________________________________________
 */
 resource "aci_fabric_if_pol" "link_level" {
   for_each      = local.link_level
-  annotation    = each.value.annotation
   auto_neg      = each.value.auto_negotiation
   description   = each.value.description
   fec_mode      = each.value.forwarding_error_correction
@@ -133,7 +129,6 @@ resource "aci_lldp_interface_policy" "lldp_interface" {
   for_each    = local.lldp_interface
   admin_rx_st = each.value.receive_state
   admin_tx_st = each.value.transmit_state
-  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
 }
@@ -171,7 +166,6 @@ ________________________________________________________________________________
 */
 resource "aci_miscabling_protocol_interface_policy" "mcp_interface" {
   for_each    = local.mcp_interface
-  annotation  = each.value.annotation
   admin_st    = each.value.admin_state
   description = each.value.description
   name        = each.key
@@ -187,8 +181,7 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_lacp_policy" "port_channel" {
-  for_each   = local.port_channel
-  annotation = each.value.annotation
+  for_each = local.port_channel
   ctrl = anytrue(
     [each.value.control["fast_select_hot_standby_ports"
       ], each.value.control["graceful_convergence"
@@ -246,7 +239,6 @@ ________________________________________________________________________________
 */
 resource "aci_port_security_policy" "port_security" {
   for_each    = local.port_security
-  annotation  = each.value.annotation
   description = each.value.description
   maximum     = each.value.maximum_endpoints
   name        = each.key
@@ -264,8 +256,7 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_spanning_tree_interface_policy" "spanning_tree_interface" {
-  for_each   = local.spanning_tree_interface
-  annotation = each.value.annotation
+  for_each = local.spanning_tree_interface
   ctrl = alltrue(concat(
     [each.value.bpdu_filter == "enabled" ? true : false],
     [each.value.bpdu_guard == "enabled" ? true : false]

@@ -9,7 +9,6 @@ ________________________________________________________________________________
 */
 resource "aci_vlan_pool" "vlan_pools" {
   for_each    = local.vlan_pools
-  annotation  = each.value.annotation
   alloc_mode  = each.value.allocation_mode
   description = each.value.description
   name        = each.key
@@ -20,7 +19,6 @@ resource "aci_ranges" "vlans" {
     aci_vlan_pool.vlan_pools
   ]
   for_each     = local.vlan_ranges
-  annotation   = each.value.annotation
   description  = each.value.description
   alloc_mode   = each.value.allocation_mode
   from         = "vlan-${each.value.from}"

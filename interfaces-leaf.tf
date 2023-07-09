@@ -21,7 +21,6 @@ resource "aci_leaf_access_port_policy_group" "leaf_interfaces_policy_groups_acce
     aci_spanning_tree_interface_policy.spanning_tree_interface
   ]
   for_each    = local.leaf_interfaces_policy_groups_access
-  annotation  = each.value.annotation
   description = each.value.description
   name        = each.key
   # class: infraAttEntityP
@@ -134,7 +133,6 @@ ________________________________________________________________________________
 */
 resource "aci_leaf_breakout_port_group" "leaf_interfaces_policy_groups_breakout" {
   for_each    = local.leaf_interfaces_policy_groups_breakout
-  annotation  = each.value.annotation
   brkout_map  = each.value.breakout_map
   description = each.value.description
   name        = each.key
@@ -164,7 +162,6 @@ resource "aci_leaf_access_bundle_policy_group" "leaf_interfaces_policy_groups_bu
     aci_spanning_tree_interface_policy.spanning_tree_interface
   ]
   for_each    = local.leaf_interfaces_policy_groups_bundle
-  annotation  = each.value.annotation
   description = each.value.description
   lag_t       = each.value.link_aggregation_type == "vpc" ? "node" : "link"
   name        = each.key

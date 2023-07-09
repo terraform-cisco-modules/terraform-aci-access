@@ -11,7 +11,6 @@ resource "aci_vpc_domain_policy" "vpc_domain" {
   for_each = {
     for v in toset(["default"]) : "default" => v if local.recommended_settings.vpc_domain == true
   }
-  annotation  = coalesce(local.vpc.annotation, var.annotation)
   dead_intvl  = local.vpc.dead_interval
   description = local.vpc.description
   name        = each.key

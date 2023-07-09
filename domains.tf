@@ -12,7 +12,6 @@ resource "aci_l3_domain_profile" "l3_domains" {
     aci_vlan_pool.vlan_pools
   ]
   for_each                  = local.l3_domains
-  annotation                = each.value.annotation
   name                      = each.key
   relation_infra_rs_vlan_ns = aci_vlan_pool.vlan_pools[each.value.vlan_pool].id
 }
@@ -31,7 +30,6 @@ resource "aci_physical_domain" "physical_domains" {
     aci_vlan_pool.vlan_pools
   ]
   for_each                  = local.physical_domains
-  annotation                = each.value.annotation
   name                      = each.key
   relation_infra_rs_vlan_ns = aci_vlan_pool.vlan_pools[each.value.vlan_pool].id
 }
