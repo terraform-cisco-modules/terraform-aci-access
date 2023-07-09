@@ -28,7 +28,7 @@ locals {
     error_disabled_recovery = false
     mcp_instance            = false
     qos_class               = false
-    vpc_domain              = false
+    vpc_domain_policy       = false
   })
   sw_pgs_leaf  = lookup(lookup(var.access, "switches", {}), "leaf", {})
   sw_pgs_spine = lookup(lookup(var.access, "switches", {}), "spine", {})
@@ -46,6 +46,7 @@ locals {
   mcpi     = local.defaults.access.policies.global.mcp_instance
   recovery = local.defaults.access.policies.global.error_disabled_recovery
   qos      = local.defaults.access.policies.global.qos_class
+  vpcp     = local.defaults.access.policies.global.vpc_domain_policy
   # Defaults: Policies -> Interface
   cdp  = local.defaults.access.policies.interface.cdp_interface
   fc   = local.defaults.access.policies.interface.fibre_channel_interface
@@ -97,9 +98,10 @@ locals {
     for k, v in lookup(local.global, "attachable_access_entity_profiles", {}) : v.name => {
       description = lookup(v, "description", local.aaep.description)
       domains = compact(concat(
-        [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.l3_domains["${i}"].id],
-        [for i in lookup(v, "physical_domains", []) : aci_physical_domain.physical_domains["${i}"].id],
-        [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.vmm_domains["${i}"].id]
+        #[for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.map["${i}"].id],
+        #[for i in lookup(v, "physical_domains", []) : aci_physical_domain.map["${i}"].id],
+        #[for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.map["${i}"].id]
+        []
       ))
     }
   }
@@ -119,9 +121,40 @@ locals {
         mode                = lookup(v, "mode", local.dhcp.mode)
         name                = s
         tenant              = lookup(v, "tenant", local.dhcp.tenant)
+        new_key             = "${v.epg_type}:${v.epg}:${s}"
       }
     ]
-  ]) : i.name => i }
+  ]) : "${i.new_key}" => i }
+
+  error_disabled_recovery = local.rss.error_disabled_recovery == false && length(lookup(local.global, "error_disabled_recovery", {})
+    ) > 0 ? merge(
+    { create = true }, local.recovery, lookup(local.global, "error_disabled_recovery", {},
+    { events = merge(local.recovery.events, lookup(lookup(local.global, "error_disabled_recovery", {}), "events", {})) })
+    ) : length(regexall(true, local.rss.error_disabled_recovery)
+  ) > 0 ? merge({ create = true }, local.recovery) : merge({ create = false }, local.recovery)
+
+  mcp_instance = local.rss.mcp_instance == false && length(lookup(local.global, "mcp_instance", {})
+    ) > 0 ? merge({ create = true }, local.mcpi, lookup(local.global, "mcp_instance", {}),
+    { transmission_frequency = merge(local.mcpi.transmission_frequency, lookup(lookup(
+      local.global, "mcp_instance", {}), "transmission_frequency", {}))
+    }) : length(regexall(true, local.rss.mcp_instance)
+  ) > 0 ? merge({ create = true }, local.mcpi) : merge({ create = false }, local.mcpi)
+
+  qos_class = local.rss.qos_class == false && length(lookup(local.global, "qos_class", {})
+    ) > 0 ? merge({ create = true }, local.qos, lookup(local.global, "qos_class", {})
+    ) : length(regexall(true, local.rss.qos_class)
+  ) > 0 ? merge({ create = true }, local.qos) : merge({ create = false }, local.qos)
+
+  vpc_domain_policy = local.rss.vpc_domain_policy == false && length(lookup(local.global, "vpc_domain_policy", {})
+    ) > 0 ? merge({ create = true }, local.vpcp, lookup(local.global, "vpc_domain_policy", {})
+    ) : length(regexall(true, local.rss.vpc_domain_policy)
+  ) > 0 ? merge({ create = true }, local.vpcp) : merge({ create = false }, local.vpcp)
+
+
+  #__________________________________________________________
+  #
+  # Interface Policies Variables
+  #__________________________________________________________
 
   #===================================
   # Merge - CDP
@@ -403,7 +436,7 @@ locals {
   }
 
 
-  bundle_list = lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "access", [])
+  bundle_list = lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "bundle", [])
   bnetflow    = local.lbundle.netflow_monitor_policies
   leaf_interfaces_policy_groups_bundle = { for i in flatten([
     for v in local.bundle_list : [

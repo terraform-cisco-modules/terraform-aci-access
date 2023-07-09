@@ -7,7 +7,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > CDP Interface : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_cdp_interface_policy" "cdp_interface" {
+resource "aci_cdp_interface_policy" "map" {
   for_each    = local.cdp_interface
   admin_st    = each.value.admin_state
   description = each.value.description
@@ -26,7 +26,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "cdp_interface_global_alias" {
   depends_on = [
-    aci_cdp_interface_policy.cdp_interface,
+    aci_cdp_interface_policy.map,
   ]
   for_each   = { for k, v in local.cdp_interface : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
@@ -45,7 +45,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > Fibre Channel Interface : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_interface_fc_policy" "fibre_channel_interface" {
+resource "aci_interface_fc_policy" "map" {
   for_each     = local.fibre_channel_interface
   automaxspeed = each.value.auto_max_speed
   description  = each.value.description
@@ -66,7 +66,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > L2 Interface : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_l2_interface_policy" "l2_interface" {
+resource "aci_l2_interface_policy" "map" {
   for_each    = local.l2_interface
   description = each.value.description
   name        = each.key
@@ -84,9 +84,9 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > Link Level : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_fabric_if_pol" "link_level" {
+resource "aci_fabric_if_pol" "map" {
   for_each      = local.link_level
-  auto_neg      = each.value.auto_negotiation
+  auto_neg      = each.value.auto_negotiation == true ? "on" : "off"
   description   = each.value.description
   fec_mode      = each.value.forwarding_error_correction
   link_debounce = each.value.link_debounce_interval
@@ -106,7 +106,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "link_level_global_alias" {
   depends_on = [
-    aci_fabric_if_pol.link_level,
+    aci_fabric_if_pol.map,
   ]
   for_each   = { for k, v in local.link_level : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
@@ -125,7 +125,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > LLDP Interface : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_lldp_interface_policy" "lldp_interface" {
+resource "aci_lldp_interface_policy" "map" {
   for_each    = local.lldp_interface
   admin_rx_st = each.value.receive_state
   admin_tx_st = each.value.transmit_state
@@ -145,7 +145,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "lldp_interface_global_alias" {
   depends_on = [
-    aci_lldp_interface_policy.lldp_interface,
+    aci_lldp_interface_policy.map,
   ]
   for_each   = { for k, v in local.lldp_interface : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
@@ -164,7 +164,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > MCP Interface : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_miscabling_protocol_interface_policy" "mcp_interface" {
+resource "aci_miscabling_protocol_interface_policy" "map" {
   for_each    = local.mcp_interface
   admin_st    = each.value.admin_state
   description = each.value.description
@@ -180,7 +180,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > Port Channel : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_lacp_policy" "port_channel" {
+resource "aci_lacp_policy" "map" {
   for_each = local.port_channel
   ctrl = anytrue(
     [each.value.control["fast_select_hot_standby_ports"
@@ -203,7 +203,7 @@ resource "aci_lacp_policy" "port_channel" {
   max_links   = each.value.maximum_number_of_links
   min_links   = each.value.minimum_number_of_links
   name        = each.key
-  mode        = each.value.mode
+  #mode        = each.value.mode
 }
 
 /*_____________________________________________________________________________________________________________________
@@ -218,7 +218,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "port_channel_global_alias" {
   depends_on = [
-    aci_lacp_policy.port_channel,
+    aci_lacp_policy.map,
   ]
   for_each   = { for k, v in local.port_channel : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
@@ -237,7 +237,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > Port Security : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_port_security_policy" "port_security" {
+resource "aci_port_security_policy" "map" {
   for_each    = local.port_security
   description = each.value.description
   maximum     = each.value.maximum_endpoints
@@ -255,7 +255,7 @@ GUI Location:
  - Fabric > Access Policies > Policies > Interface > Spanning Tree Interface : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_spanning_tree_interface_policy" "spanning_tree_interface" {
+resource "aci_spanning_tree_interface_policy" "map" {
   for_each = local.spanning_tree_interface
   ctrl = alltrue(concat(
     [each.value.bpdu_filter == "enabled" ? true : false],
@@ -283,7 +283,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "spanning_tree_interface_global_alias" {
   depends_on = [
-    aci_spanning_tree_interface_policy.spanning_tree_interface,
+    aci_spanning_tree_interface_policy.map,
   ]
   for_each   = { for k, v in local.spanning_tree_interface : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"

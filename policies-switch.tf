@@ -7,11 +7,11 @@ GUI Location:
  - Fabric -> Access Policies -> Policies -> Switch -> VPC Domain -> Create VPC Domain Policy
 _______________________________________________________________________________________________________________________
 */
-resource "aci_vpc_domain_policy" "vpc_domain" {
+resource "aci_vpc_domain_policy" "map" {
   for_each = {
-    for v in toset(["default"]) : "default" => v if local.recommended_settings.vpc_domain == true
+    for v in [local.vpc_domain_policy] : "default" => v if v.create == true
   }
-  dead_intvl  = local.vpc.dead_interval
-  description = local.vpc.description
+  dead_intvl  = each.value.dead_interval
+  description = each.value.description
   name        = each.key
 }

@@ -7,7 +7,7 @@ GUI Location:
  - Fabric > Access Policies > Physical and External Domains > L3 Domains: {{name}}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_l3_domain_profile" "l3_domains" {
+resource "aci_l3_domain_profile" "map" {
   depends_on = [
     aci_vlan_pool.vlan_pools
   ]
@@ -25,7 +25,7 @@ GUI Location:
  - Fabric > Access Policies > Physical and External Domains > Physical Domains: {{Name}}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_physical_domain" "physical_domains" {
+resource "aci_physical_domain" "map" {
   depends_on = [
     aci_vlan_pool.vlan_pools
   ]

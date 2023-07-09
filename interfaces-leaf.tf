@@ -8,17 +8,17 @@ GUI Location:
 
 _______________________________________________________________________________________________________________________
 */
-resource "aci_leaf_access_port_policy_group" "leaf_interfaces_policy_groups_access" {
+resource "aci_leaf_access_port_policy_group" "map" {
   depends_on = [
-    aci_attachable_access_entity_profile.attachable_access_entity_profiles,
-    aci_cdp_interface_policy.cdp_interface,
-    aci_interface_fc_policy.fibre_channel_interface,
-    aci_l2_interface_policy.l2_interface,
-    aci_fabric_if_pol.link_level,
-    aci_lldp_interface_policy.lldp_interface,
-    aci_miscabling_protocol_interface_policy.mcp_interface,
-    aci_port_security_policy.port_security,
-    aci_spanning_tree_interface_policy.spanning_tree_interface
+    aci_attachable_access_entity_profile.map,
+    aci_cdp_interface_policy.map,
+    aci_interface_fc_policy.map,
+    aci_l2_interface_policy.map,
+    aci_fabric_if_pol.map,
+    aci_lldp_interface_policy.map,
+    aci_miscabling_protocol_interface_policy.map,
+    aci_port_security_policy.map,
+    aci_spanning_tree_interface_policy.map
   ]
   for_each    = local.leaf_interfaces_policy_groups_access
   description = each.value.description
@@ -111,7 +111,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "leaf_interfaces_policy_groups_access_global_alias" {
   depends_on = [
-    aci_leaf_access_port_policy_group.leaf_interfaces_policy_groups_access,
+    aci_leaf_access_port_policy_group.map,
   ]
   for_each   = { for k, v in local.leaf_interfaces_policy_groups_access : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"
@@ -131,7 +131,7 @@ GUI Location:
  - Fabric > Access Policies > Interface > Leaf Interfaces > Policy Groups > Leaf Breakout Port Group:{{Name}}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_leaf_breakout_port_group" "leaf_interfaces_policy_groups_breakout" {
+resource "aci_leaf_breakout_port_group" "map" {
   for_each    = local.leaf_interfaces_policy_groups_breakout
   brkout_map  = each.value.breakout_map
   description = each.value.description
@@ -148,18 +148,18 @@ GUI Location:
  - Fabric > Interfaces > Leaf Interfaces > Policy Groups > [PC or VPC] Interface > {{Name}}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_leaf_access_bundle_policy_group" "leaf_interfaces_policy_groups_bundle" {
+resource "aci_leaf_access_bundle_policy_group" "map" {
   depends_on = [
-    aci_attachable_access_entity_profile.attachable_access_entity_profiles,
-    aci_cdp_interface_policy.cdp_interface,
-    aci_interface_fc_policy.fibre_channel_interface,
-    aci_l2_interface_policy.l2_interface,
-    aci_lacp_policy.port_channel,
-    aci_fabric_if_pol.link_level,
-    aci_lldp_interface_policy.lldp_interface,
-    aci_miscabling_protocol_interface_policy.mcp_interface,
-    aci_port_security_policy.port_security,
-    aci_spanning_tree_interface_policy.spanning_tree_interface
+    aci_attachable_access_entity_profile.map,
+    aci_cdp_interface_policy.map,
+    aci_interface_fc_policy.map,
+    aci_l2_interface_policy.map,
+    aci_lacp_policy.map,
+    aci_fabric_if_pol.map,
+    aci_lldp_interface_policy.map,
+    aci_miscabling_protocol_interface_policy.map,
+    aci_port_security_policy.map,
+    aci_spanning_tree_interface_policy.map
   ]
   for_each    = local.leaf_interfaces_policy_groups_bundle
   description = each.value.description

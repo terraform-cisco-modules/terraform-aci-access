@@ -135,11 +135,14 @@ defaults:
           micro_burst_leaf_queues: 0
           name: default
           preserve_cos: true
+        vpc_domain_policy:
+          delay_restore_timer: 120
+          peer_dead_interval: 120
         recommended_settings:
           error_disabled_recovery: false
           mcp_instance: false
           qos_class: false
-          vpc_domain: false
+          vpc_domain_policy: false
       # INTERFACE POLICIES
       interface:
         cdp_interface:

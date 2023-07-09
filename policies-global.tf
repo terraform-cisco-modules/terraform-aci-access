@@ -7,11 +7,11 @@ GUI Location:
  - Fabric > Access Policies > Policies > Global > Attachable Access Entity Profiles : {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_attachable_access_entity_profile" "attachable_access_entity_profiles" {
+resource "aci_attachable_access_entity_profile" "map" {
   depends_on = [
-    aci_l3_domain_profile.l3_domains,
-    aci_physical_domain.physical_domains,
-    aci_vmm_domain.vmm_domains
+    aci_l3_domain_profile.map,
+    aci_physical_domain.map,
+    aci_vmm_domain.map
   ]
   for_each                = local.attachable_access_entity_profiles
   description             = each.value.description
@@ -28,12 +28,12 @@ GUI Location:
  - Fabric > Access Policies > Policies > Global > Attachable Access Entity Profiles : {name}: Application EPGs
 _______________________________________________________________________________________________________________________
 */
-resource "aci_access_generic" "access_generic" {
+resource "aci_access_generic" "map" {
   depends_on = [
-    aci_attachable_access_entity_profile.attachable_access_entity_profiles
+    aci_attachable_access_entity_profile.map
   ]
   for_each                            = local.attachable_access_entity_profiles
-  attachable_access_entity_profile_dn = aci_attachable_access_entity_profile.attachable_access_entity_profiles[each.key].id
+  attachable_access_entity_profile_dn = aci_attachable_access_entity_profile.map[each.key].id
   name                                = "default"
 }
 
@@ -99,22 +99,20 @@ GUI Location:
  - Fabric > Access Policies > Policies > Global > Error Disabled Recovery Policy
 _______________________________________________________________________________________________________________________
 */
-resource "aci_error_disable_recovery" "error_disabled_recovery" {
-  for_each = {
-    for v in toset(["default"]) : "default" => v if local.recommended_settings.error_disabled_recovery == true
-  }
-  err_dis_recov_intvl = local.recovery.error_disable_recovery_interval
+resource "aci_error_disable_recovery" "map" {
+  for_each            = { for v in [local.error_disabled_recovery] : "default" => v if v.create == true }
+  err_dis_recov_intvl = each.value.error_disable_recovery_interval
   edr_event {
     event   = "event-bpduguard"
-    recover = local.recovery.events.bpdu_guard == true ? "yes" : "no"
+    recover = each.value.events.bpdu_guard == true ? "yes" : "no"
   }
   edr_event {
     event   = "event-ep-move"
-    recover = local.recovery.events.frequent_endpoint_move == true ? "yes" : "no"
+    recover = each.value.events.frequent_endpoint_move == true ? "yes" : "no"
   }
   edr_event {
     event   = "event-mcp-loop"
-    recover = local.recovery.events.loop_indication_by_mcp == true ? "yes" : "no"
+    recover = each.value.events.loop_indication_by_mcp == true ? "yes" : "no"
   }
 }
 
@@ -127,20 +125,20 @@ GUI Location:
  - Fabric > Access Policies > Policies > Global > MCP Instance Policy default
 _______________________________________________________________________________________________________________________
 */
-resource "aci_mcp_instance_policy" "mcp_instance" {
+resource "aci_mcp_instance_policy" "map" {
   for_each = {
-    for v in toset(["default"]) : "default" => v if local.recommended_settings.mcp_instance == true
+    for v in [local.mcp_instance] : "default" => v if v.create == true
   }
-  admin_st = local.mcpi.admin_state
-  ctrl = length(regexall(true, local.mcpi.enable_mcp_pdu_per_vlan)
+  admin_st = each.value.admin_state
+  ctrl = length(regexall(true, each.value.enable_mcp_pdu_per_vlan)
   ) > 0 ? ["pdu-per-vlan", "stateful-ha"] : ["stateful-ha"]
-  description      = local.mcpi.description
-  init_delay_time  = local.mcpi.initial_delay
+  description      = each.value.description
+  init_delay_time  = each.value.initial_delay
   key              = var.mcp_instance_key
-  loop_detect_mult = local.mcpi.loop_detect_multiplication_factor
-  loop_protect_act = local.mcpi.loop_protection_disable_port == true ? "port-disable" : "none"
-  tx_freq          = local.mcpi.transmission_frequency.seconds
-  tx_freq_msec     = local.mcpi.transmission_frequency.msec
+  loop_detect_mult = each.value.loop_detect_multiplication_factor
+  loop_protect_act = each.value.loop_protection_disable_port == true ? "port-disable" : "none"
+  tx_freq          = each.value.transmission_frequency.seconds
+  tx_freq_msec     = each.value.transmission_frequency.msec
 }
 
 /*_____________________________________________________________________________________________________________________
@@ -153,18 +151,18 @@ GUI Location:
 
 _______________________________________________________________________________________________________________________
 */
-resource "aci_qos_instance_policy" "qos_class" {
+resource "aci_qos_instance_policy" "map" {
   for_each = {
-    for v in toset(["default"]) : "default" => v if local.recommended_settings.qos_class == true
+    for v in [local.qos_class] : "default" => v if v.create == true
   }
-  ctrl                  = local.qos.preserve_cos == true ? "dot1p-preserve" : "none"
-  description           = local.qos.description
-  etrap_age_timer       = local.qos.elephant_trap_age_period
-  etrap_bw_thresh       = local.qos.elephant_trap_bandwidth_threshold
-  etrap_byte_ct         = local.qos.elephant_trap_byte_count
-  etrap_st              = local.qos.elephant_trap_state == true ? "yes" : "no"
-  fabric_flush_interval = local.qos.fabric_flush_interval
-  fabric_flush_st       = local.qos.fabric_flush_state == true ? "yes" : "no"
-  uburst_spine_queues   = local.qos.micro_burst_spine_queues
-  uburst_tor_queues     = local.qos.micro_burst_leaf_queues
+  ctrl                  = each.value.preserve_cos == true ? "dot1p-preserve" : "none"
+  description           = each.value.description
+  etrap_age_timer       = each.value.elephant_trap_age_period
+  etrap_bw_thresh       = each.value.elephant_trap_bandwidth_threshold
+  etrap_byte_ct         = each.value.elephant_trap_byte_count
+  etrap_st              = each.value.elephant_trap_state == true ? "yes" : "no"
+  fabric_flush_interval = each.value.fabric_flush_interval
+  fabric_flush_st       = each.value.fabric_flush_state == true ? "yes" : "no"
+  uburst_spine_queues   = each.value.micro_burst_spine_queues
+  uburst_tor_queues     = each.value.micro_burst_leaf_queues
 }

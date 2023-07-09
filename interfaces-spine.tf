@@ -7,11 +7,11 @@ GUI Location:
  - Fabric > Interfaces > Spine Interfaces > Policy Groups > {name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_spine_port_policy_group" "spine_interface_policy_groups" {
+resource "aci_spine_port_policy_group" "map" {
   depends_on = [
-    aci_attachable_access_entity_profile.attachable_access_entity_profiles,
-    aci_cdp_interface_policy.cdp_interface,
-    aci_fabric_if_pol.link_level,
+    aci_attachable_access_entity_profile.map,
+    aci_cdp_interface_policy.map,
+    aci_fabric_if_pol.map,
   ]
   for_each    = local.spine_interface_policy_groups
   description = each.value.description
@@ -42,7 +42,7 @@ ________________________________________________________________________________
 */
 resource "aci_rest_managed" "spine_interface_policy_groups_global_alias" {
   depends_on = [
-    aci_spine_port_policy_group.spine_interface_policy_groups,
+    aci_spine_port_policy_group.map,
   ]
   for_each   = { for k, v in local.spine_interface_policy_groups : k => v if v.global_alias != "" }
   class_name = "tagAliasInst"

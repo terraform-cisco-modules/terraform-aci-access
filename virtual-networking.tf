@@ -7,7 +7,7 @@ GUI Location:
  - Virtual Networking -> {switch_provider} -> {domain_name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_vmm_domain" "vmm_domains" {
+resource "aci_vmm_domain" "map" {
   depends_on = [
     aci_vlan_pool.vlan_pools
   ]
@@ -30,7 +30,7 @@ resource "aci_vmm_domain" "vmm_domains" {
 
 resource "aci_rest_managed" "vmm_domain_uplinks" {
   depends_on = [
-    aci_vmm_domain.vmm_domains
+    aci_vmm_domain.map
   ]
   for_each   = local.vmm_domains
   class_name = "vmmUplinkPCont"
@@ -62,14 +62,14 @@ GUI Location:
  - Virtual Networking -> {switch_provider} -> {domain_name} -> Credentials
 _______________________________________________________________________________________________________________________
 */
-resource "aci_vmm_credential" "credentials" {
+resource "aci_vmm_credential" "map" {
   depends_on = [
-    aci_vmm_domain.vmm_domains
+    aci_vmm_domain.map
   ]
   for_each      = local.vmm_credentials
   description   = each.value.description
   name          = each.value.dvs
-  vmm_domain_dn = aci_vmm_domain.vmm_domains[each.value.dvs].id
+  vmm_domain_dn = aci_vmm_domain.map[each.value.dvs].id
   pwd           = var.vmm_password
   usr           = each.value.username
 }
@@ -83,13 +83,13 @@ GUI Location:
  - Virtual Networking -> {switch_provider} -> {domain_name} -> {controller_name}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_vmm_controller" "controllers" {
+resource "aci_vmm_controller" "map" {
   depends_on = [
-    aci_vmm_credential.credentials,
-    aci_vmm_domain.vmm_domains
+    aci_vmm_credential.map,
+    aci_vmm_domain.map
   ]
   for_each            = local.vmm_controllers
-  vmm_domain_dn       = aci_vmm_domain.vmm_domains[each.value.dvs].id
+  vmm_domain_dn       = aci_vmm_domain.map[each.value.dvs].id
   name                = each.value.hostname
   dvs_version         = each.value.dvs_version
   host_or_ip          = each.value.hostname
@@ -101,7 +101,7 @@ resource "aci_vmm_controller" "controllers" {
   seq_num             = each.value.sequence_number
   stats_mode          = each.value.stats_collection
   vxlan_depl_pref     = each.value.switch_mode == "nsx" ? "nsx" : "vxlan"
-  relation_vmm_rs_acc = aci_vmm_credential.credentials[each.value.dvs].id
+  relation_vmm_rs_acc = aci_vmm_credential.map[each.value.dvs].id
   # relation_vmm_rs_ctrlr_p_mon_pol = length(compact([each.value.monitoring_policy])
   # ) > 0 ? "uni/infra/moninfra-${each.value.monitoring_policy}" : ""
   # relation_vmm_rs_mgmt_e_pg = "uni/tn-mgmt/mgmtp-default/${each.value.mgmt_epg_type}-${each.value.management_epg}"
@@ -119,12 +119,12 @@ GUI Location:
  - Virtual Networking -> {switch_provider} -> {domain_name} -> VSwitch Policy
 _______________________________________________________________________________________________________________________
 */
-resource "aci_vswitch_policy" "vswitch_policies" {
+resource "aci_vswitch_policy" "map" {
   depends_on = [
-    aci_vmm_domain.vmm_domains
+    aci_vmm_domain.map
   ]
   for_each      = local.vswitch_policies
-  vmm_domain_dn = aci_vmm_domain.vmm_domains[each.value.dvs].id
+  vmm_domain_dn = aci_vmm_domain.map[each.value.dvs].id
   dynamic "relation_vmm_rs_vswitch_exporter_pol" {
     for_each = { for v in each.value.netflow_export_policy : v.netflow_policy => v }
     content {
