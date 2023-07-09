@@ -9,9 +9,9 @@ ________________________________________________________________________________
 */
 resource "aci_vpc_domain_policy" "map" {
   for_each = {
-    for v in [local.vpc_domain_policy] : "default" => v if v.create == true
+    for v in [local.vpc_domain] : "default" => v if v.create == true
   }
-  dead_intvl  = each.value.dead_interval
+  dead_intvl  = each.value.peer_dead_interval
   description = each.value.description
   name        = each.key
 }

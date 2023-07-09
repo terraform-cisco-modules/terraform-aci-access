@@ -24,12 +24,8 @@ locals {
     port_security           = false
     spanning_tree_interface = false
   })
-  rss = lookup(local.global, "recommended_settings", {
-    error_disabled_recovery = false
-    mcp_instance            = false
-    qos_class               = false
-    vpc_domain_policy       = false
-  })
+  rsp          = local.defaults.access.policies.global.recommended_policies
+  rss          = merge(local.rsp, lookup(local.global, "recommended_policies", {}))
   sw_pgs_leaf  = lookup(lookup(var.access, "switches", {}), "leaf", {})
   sw_pgs_spine = lookup(lookup(var.access, "switches", {}), "spine", {})
   # Defaults: Domains
@@ -39,14 +35,15 @@ locals {
   laccess = local.defaults.access.interfaces.leaf.policy_groups.access
   lbrkout = local.defaults.access.interfaces.leaf.policy_groups.breakout
   lbundle = local.defaults.access.interfaces.leaf.policy_groups.bundle
+  netflow = local.defaults.access.interfaces.leaf.policy_groups.netflow_monitor_policies
   saccess = local.defaults.access.interfaces.spine.policy_groups
   # Defaults: Policies -> Global
   aaep     = local.defaults.access.policies.global.attachable_access_entity_profiles
   dhcp     = local.defaults.access.policies.global.dhcp_relay
-  mcpi     = local.defaults.access.policies.global.mcp_instance
-  recovery = local.defaults.access.policies.global.error_disabled_recovery
+  mcpi     = local.defaults.access.policies.global.mcp_instance_policy
+  recovery = local.defaults.access.policies.global.error_disabled_recovery_policy
   qos      = local.defaults.access.policies.global.qos_class
-  vpcp     = local.defaults.access.policies.global.vpc_domain_policy
+  vpcp     = local.defaults.access.policies.global.vpc_domain
   # Defaults: Policies -> Interface
   cdp  = local.defaults.access.policies.interface.cdp_interface
   fc   = local.defaults.access.policies.interface.fibre_channel_interface
@@ -98,10 +95,9 @@ locals {
     for k, v in lookup(local.global, "attachable_access_entity_profiles", {}) : v.name => {
       description = lookup(v, "description", local.aaep.description)
       domains = compact(concat(
-        #[for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.map["${i}"].id],
-        #[for i in lookup(v, "physical_domains", []) : aci_physical_domain.map["${i}"].id],
-        #[for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.map["${i}"].id]
-        []
+        [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.map["${i}"].id],
+        [for i in lookup(v, "physical_domains", []) : aci_physical_domain.map["${i}"].id],
+        [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.map["${i}"].id]
       ))
     }
   }
@@ -126,18 +122,18 @@ locals {
     ]
   ]) : "${i.new_key}" => i }
 
-  error_disabled_recovery = local.rss.error_disabled_recovery == false && length(lookup(local.global, "error_disabled_recovery", {})
-    ) > 0 ? merge(
-    { create = true }, local.recovery, lookup(local.global, "error_disabled_recovery", {},
-    { events = merge(local.recovery.events, lookup(lookup(local.global, "error_disabled_recovery", {}), "events", {})) })
-    ) : length(regexall(true, local.rss.error_disabled_recovery)
+  error_disabled_recovery = local.rss.error_disabled_recovery_policy == false && length(lookup(
+    local.global, "error_disabled_recovery_policy", {})) > 0 ? merge(
+    { create = true }, local.recovery, lookup(local.global, "error_disabled_recovery_policy", {},
+    { events = merge(local.recovery.events, lookup(lookup(local.global, "error_disabled_recovery_policy", {}), "events", {})) })
+    ) : length(regexall(true, local.rss.error_disabled_recovery_policy)
   ) > 0 ? merge({ create = true }, local.recovery) : merge({ create = false }, local.recovery)
 
-  mcp_instance = local.rss.mcp_instance == false && length(lookup(local.global, "mcp_instance", {})
-    ) > 0 ? merge({ create = true }, local.mcpi, lookup(local.global, "mcp_instance", {}),
+  mcp_instance = local.rss.mcp_instance_policy == false && length(lookup(local.global, "mcp_instance_policy", {})
+    ) > 0 ? merge({ create = true }, local.mcpi, lookup(local.global, "mcp_instance_policy", {}),
     { transmission_frequency = merge(local.mcpi.transmission_frequency, lookup(lookup(
-      local.global, "mcp_instance", {}), "transmission_frequency", {}))
-    }) : length(regexall(true, local.rss.mcp_instance)
+      local.global, "mcp_instance_policy", {}), "transmission_frequency", {}))
+    }) : length(regexall(true, local.rss.mcp_instance_policy)
   ) > 0 ? merge({ create = true }, local.mcpi) : merge({ create = false }, local.mcpi)
 
   qos_class = local.rss.qos_class == false && length(lookup(local.global, "qos_class", {})
@@ -145,9 +141,9 @@ locals {
     ) : length(regexall(true, local.rss.qos_class)
   ) > 0 ? merge({ create = true }, local.qos) : merge({ create = false }, local.qos)
 
-  vpc_domain_policy = local.rss.vpc_domain_policy == false && length(lookup(local.global, "vpc_domain_policy", {})
-    ) > 0 ? merge({ create = true }, local.vpcp, lookup(local.global, "vpc_domain_policy", {})
-    ) : length(regexall(true, local.rss.vpc_domain_policy)
+  vpc_domain = local.rss.vpc_domain == false && length(lookup(local.global, "vpc_domain", {})
+    ) > 0 ? merge({ create = true }, local.vpcp, lookup(local.global, "vpc_domain", {})
+    ) : length(regexall(true, local.rss.vpc_domain)
   ) > 0 ? merge({ create = true }, local.vpcp) : merge({ create = false }, local.vpcp)
 
 
@@ -223,210 +219,22 @@ locals {
   spanning_tree_interface = {
     for v in local.stp_policies : v.name => merge(local.stp, v)
   }
-  #__________________________________________________________
-  #
-  # Interface Policies Variables
-  #__________________________________________________________
-
-  #===================================
-  # Global - CDP Interface
-  #===================================
-
-  #cdp_interface = {
-  #  for v in local.cdp_policies : v.name => {
-  #    admin_state  = lookup(v, "admin_state", local.cdp.admin_state)
-  #    description  = lookup(v, "description", local.cdp.description)
-  #    global_alias = lookup(v, "global_alias", local.cdp.global_alias)
-  #  }
-  #}
-
-  #===================================
-  # Global - Fibre-Channel Interface
-  #===================================
-
-  #fibre_channel_interface = {
-  #  for v in local.fc_policies : v.name => {
-  #    auto_max_speed        = lookup(v, "auto_max_speed", local.fc.auto_max_speed)
-  #    description           = lookup(v, "description", local.fc.description)
-  #    fill_pattern          = lookup(v, "fill_pattern", local.fc.fill_pattern)
-  #    port_mode             = lookup(v, "port_mode", local.fc.port_mode)
-  #    receive_buffer_credit = lookup(v, "receive_buffer_credit", local.fc.receive_buffer_credit)
-  #    speed                 = lookup(v, "speed", local.fc.speed)
-  #    trunk_mode            = lookup(v, "trunk_mode", local.fc.trunk_mode)
-  #  }
-  #}
-
-  #===================================
-  # Global - L2 Interface
-  #===================================
-
-  #l2_interface = {
-  #  for v in local.l2_policies : v.name => {
-  #    description      = lookup(v, "description", local.l2.description)
-  #    qinq             = lookup(v, "qinq", local.l2.qinq)
-  #    reflective_relay = lookup(v, "reflective_relay", local.l2.reflective_relay)
-  #    vlan_scope       = lookup(v, "vlan_scope", local.l2.vlan_scope)
-  #  }
-  #}
-
-  #===================================
-  # Global - Link-Level
-  #===================================
-
-  #link_level = {
-  #  for v in local.ll_policies : v.name => {
-  #    auto_negotiation            = lookup(v, "auto_negotiation", local.ll.auto_negotiation)
-  #    description                 = lookup(v, "description", local.ll.description)
-  #    global_alias                = lookup(v, "global_alias", local.ll.global_alias)
-  #    forwarding_error_correction = lookup(v, "forwarding_error_correction", local.ll.forwarding_error_correction)
-  #    link_debounce_interval      = lookup(v, "link_debounce_interval", local.ll.link_debounce_interval)
-  #    speed                       = lookup(v, "speed", local.ll.speed)
-  #  }
-  #}
-
-  #===================================
-  # Global - LLDP Interface
-  #===================================
-
-  #lldp_interface = {
-  #  for v in local.lldp_policies : v.name => {
-  #    description    = lookup(v, "description", local.lldp.description)
-  #    global_alias   = lookup(v, "global_alias", local.lldp.global_alias)
-  #    receive_state  = lookup(v, "receive_state", local.lldp.receive_state)
-  #    transmit_state = lookup(v, "transmit_state", local.lldp.transmit_state)
-  #  }
-  #}
-
-  #===================================
-  # Global - MCP Interface
-  #===================================
-
-  #mcp_interface = {
-  #  for k, v in local.mcp_policies : v.name => {
-  #    admin_state = lookup(v, "admin_state", local.mcp.admin_state)
-  #    description = lookup(v, "description", local.mcp.description)
-  #  }
-  #}
-
-  #===================================
-  # Global - Port-Channel
-  #===================================
-  #port_channel = {
-  #  for v in local.pc_policies : v.name => {
-  #    description = lookup(v, "description", local.pc.description)
-  #    control = {
-  #      fast_select_hot_standby_ports = lookup(lookup(
-  #        v, "control", {}), "fast_select_hot_standby_ports", local.pc.control.fast_select_hot_standby_ports
-  #      )
-  #      graceful_convergence = lookup(lookup(
-  #        v, "control", {}), "graceful_convergence", local.pc.control.graceful_convergence
-  #      )
-  #      load_defer_member_ports = lookup(lookup(
-  #        v, "control", {}), "load_defer_member_ports", local.pc.control.load_defer_member_ports
-  #      )
-  #      suspend_individual_port = lookup(lookup(
-  #        v, "control", {}), "suspend_individual_port", local.pc.control.suspend_individual_port
-  #      )
-  #      symmetric_hashing = lookup(lookup(
-  #        v, "control", {}), "symmetric_hashing", local.pc.control.symmetric_hashing
-  #      )
-  #    }
-  #    global_alias            = lookup(v, "global_alias", local.pc.global_alias)
-  #    maximum_number_of_links = lookup(v, "maximum_number_of_links", local.pc.maximum_number_of_links)
-  #    minimum_number_of_links = lookup(v, "minimum_number_of_links", local.pc.minimum_number_of_links)
-  #    mode                    = lookup(v, "mode", local.pc.mode)
-  #  }
-  #}
-
-  #===================================
-  # Global - Port Security
-  #===================================
-
-  #port_security = {
-  #  for k, v in local.ps_policies : v.name => {
-  #    description           = lookup(v, "description", local.ps.description)
-  #    maximum_endpoints     = lookup(v, "maximum_endpoints", local.ps.maximum_endpoints)
-  #    port_security_timeout = lookup(v, "port_security_timeout", local.ps.port_security_timeout)
-  #  }
-  #}
-
-  #===================================
-  # Global - Spanning-Tree Interface
-  #===================================
-
-  #spanning_tree_interface = {
-  #  for k, v in local.stp_policies : v.name => {
-  #    bpdu_guard   = lookup(v, "bpdu_guard", local.stp.bpdu_guard)
-  #    bpdu_filter  = lookup(v, "bpdu_filter", local.stp.bpdu_filter)
-  #    description  = lookup(v, "description", local.stp.description)
-  #    global_alias = lookup(v, "global_alias", local.stp.global_alias)
-  #  }
-  #}
-
 
   #__________________________________________________________
   #
   # Leaf Interface Policy Group Variables
   #__________________________________________________________
   access_list = lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "access", [])
-  anetflow    = local.laccess.netflow_monitor_policies
   leaf_interfaces_policy_groups_access = {
     for v in local.access_list : v.name => merge(
-      local.laccess, v, { netlfow_monitor_policies = [
+      local.laccess, v, { netflow_monitor_policies = [
         for e in lookup(v, "netflow_monitor_policies", []) : {
-          ip_filter_type         = lookup(e, "ip_filter_type", local.anetflow.ip_filter_type)
+          ip_filter_type         = lookup(e, "ip_filter_type", local.netflow.ip_filter_type)
           netflow_monitor_policy = e.netflow_monitor_policy
         }
       ] }
     )
   }
-  #leaf_interfaces_policy_groups_access = {
-  #  for v in lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "access", {}) : v.name => {
-  #    attachable_entity_profile   = lookup(v, "attachable_entity_profile", local.laccess.attachable_entity_profile)
-  #    cdp_interface_policy        = lookup(v, "cdp_interface_policy", local.laccess.cdp_interface_policy)
-  #    copp_interface_policy       = lookup(v, "copp_interface_policy", local.laccess.copp_interface_policy)
-  #    data_plane_policing_egress  = lookup(v, "data_plane_policing_egress", local.laccess.data_plane_policing_egress)
-  #    data_plane_policing_ingress = lookup(v, "data_plane_policing_ingress", local.laccess.data_plane_policing_ingress)
-  #    description                 = lookup(v, "description", local.laccess.description)
-  #    dot1x_port_authentication_policy = lookup(
-  #      v, "dot1x_port_authentication_policy", local.laccess.dot1x_port_authentication_policy
-  #    )
-  #    dwdm_policy = lookup(v, "dwdm_policy", local.laccess.dwdm_policy)
-  #    fibre_channel_interface_policy = lookup(
-  #      v, "fibre_channel_interface_policy", local.laccess.fibre_channel_interface_policy
-  #    )
-  #    global_alias        = lookup(v, "global_alias", local.laccess.global_alias)
-  #    l2_interface_policy = lookup(v, "l2_interface_policy", local.laccess.l2_interface_policy)
-  #    link_flap_policy    = lookup(v, "link_flap_policy", local.laccess.link_flap_policy)
-  #    link_level_flow_control_policy = lookup(
-  #      v, "link_level_flow_control_policy", local.laccess.link_level_flow_control_policy
-  #    )
-  #    link_level_policy     = lookup(v, "link_level_policy", local.laccess.link_level_policy)
-  #    lldp_interface_policy = lookup(v, "lldp_interface_policy", local.laccess.lldp_interface_policy)
-  #    macsec_policy         = lookup(v, "macsec_policy", local.laccess.macsec_policy)
-  #    mcp_interface_policy  = lookup(v, "mcp_interface_policy", local.laccess.mcp_interface_policy)
-  #    monitoring_policy     = lookup(v, "monitoring_policy", local.laccess.monitoring_policy)
-  #    netflow_monitor_policies = [
-  #      for s in lookup(v, "netflow_monitor_policies", []) : {
-  #        ip_filter_type         = lookup(s, "ip_filter_type", local.laccess.netflow_monitor_policies.ip_filter_type)
-  #        netflow_monitor_policy = s.netflow_monitor_policy
-  #      }
-  #    ]
-  #    poe_interface_policy = lookup(v, "poe_interface_policy", local.laccess.poe_interface_policy)
-  #    port_security_policy = lookup(v, "port_security_policy", local.laccess.port_security_policy)
-  #    priority_flow_control_policy = lookup(
-  #      v, "priority_flow_control_policy", local.laccess.priority_flow_control_policy
-  #    )
-  #    slow_drain_policy       = lookup(v, "slow_drain_policy", local.laccess.slow_drain_policy)
-  #    span_destination_groups = lookup(v, "span_destination_groups       ", [])
-  #    span_source_groups      = lookup(v, "span_source_groups            ", [])
-  #    spanning_tree_interface_policy = lookup(
-  #      v, "spanning_tree_interface_policy", local.laccess.spanning_tree_interface_policy
-  #    )
-  #    storm_control_policy   = lookup(v, "storm_control_policy", local.laccess.storm_control_policy)
-  #    synce_interface_policy = lookup(v, "synce_interface_policy", local.laccess.synce_interface_policy)
-  #  }
-  #}
 
   leaf_interfaces_policy_groups_breakout = {
     for k, v in lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "breakout", {}) : v.name => {
@@ -437,70 +245,17 @@ locals {
 
 
   bundle_list = lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "bundle", [])
-  bnetflow    = local.lbundle.netflow_monitor_policies
   leaf_interfaces_policy_groups_bundle = { for i in flatten([
     for v in local.bundle_list : [
       for s in v.names : merge(
-        local.lbundle, v, { netlfow_monitor_policies = [
+        local.lbundle, v, { netflow_monitor_policies = [
           for e in lookup(v, "netflow_monitor_policies", []) : {
-            ip_filter_type         = lookup(e, "ip_filter_type", local.bnetflow.ip_filter_type)
+            ip_filter_type         = lookup(e, "ip_filter_type", local.netflow.ip_filter_type)
             netflow_monitor_policy = e.netflow_monitor_policy
           }
       ] }, { name = s })
     ]
   ]) : i.name => i }
-  #leaf_interfaces_policy_groups_bundle = {
-  #  for i in flatten([
-  #    for v in lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "bundle", []) : [
-  #      for s in v.names : {
-  #        attachable_entity_profile = lookup(v, "attachable_entity_profile", local.lbundle.attachable_entity_profile)
-  #        cdp_interface_policy      = lookup(v, "cdp_interface_policy", local.lbundle.cdp_interface_policy)
-  #        copp_interface_policy     = lookup(v, "copp_interface_policy", local.lbundle.copp_interface_policy)
-  #        data_plane_policing_egress = lookup(
-  #          v, "data_plane_policing_egress", local.lbundle.data_plane_policing_egress
-  #        )
-  #        data_plane_policing_ingress = lookup(
-  #          v, "data_plane_policing_ingress", local.lbundle.data_plane_policing_ingress
-  #        )
-  #        description = lookup(v, "description", local.lbundle.description)
-  #        fibre_channel_interface_policy = lookup(
-  #          v, "fibre_channel_interface_policy", local.lbundle.fibre_channel_interface_policy
-  #        )
-  #        l2_interface_policy   = lookup(v, "l2_interface_policy", local.lbundle.l2_interface_policy)
-  #        link_aggregation_type = lookup(v, "link_aggregation_type", local.lbundle.link_aggregation_type)
-  #        link_flap_policy      = lookup(v, "link_flap_policy", local.lbundle.link_flap_policy)
-  #        link_level_flow_control_policy = lookup(
-  #          v, "link_level_flow_control_policy", local.lbundle.link_level_flow_control_policy
-  #        )
-  #        link_level_policy     = lookup(v, "link_level_policy", local.lbundle.link_level_policy)
-  #        lldp_interface_policy = lookup(v, "lldp_interface_policy", local.lbundle.lldp_interface_policy)
-  #        macsec_policy         = lookup(v, "macsec_policy", local.lbundle.macsec_policy)
-  #        mcp_interface_policy  = lookup(v, "mcp_interface_policy", local.lbundle.mcp_interface_policy)
-  #        monitoring_policy     = lookup(v, "monitoring_policy", local.lbundle.monitoring_policy)
-  #        name                  = s
-  #        netflow_monitor_policies = [
-  #          for s in lookup(v, "netflow_monitor_policies", []) : {
-  #            ip_filter_type         = lookup(s, "ip_filter_type", local.lbundle.netflow_monitor_policies.ip_filter_type)
-  #            netflow_monitor_policy = s.netflow_monitor_policy
-  #          }
-  #        ]
-  #        port_channel_policy  = lookup(v, "port_channel_policy", local.lbundle.port_channel_policy)
-  #        port_security_policy = lookup(v, "port_security_policy", local.lbundle.port_security_policy)
-  #        priority_flow_control_policy = lookup(
-  #          v, "priority_flow_control_policy", local.lbundle.priority_flow_control_policy
-  #        )
-  #        slow_drain_policy       = lookup(v, "slow_drain_policy", local.lbundle.slow_drain_policy)
-  #        span_destination_groups = lookup(v, "span_destination_groups", [])
-  #        span_source_groups      = lookup(v, "span_source_groups", [])
-  #        spanning_tree_interface_policy = lookup(
-  #          v, "spanning_tree_interface_policy", local.lbundle.spanning_tree_interface_policy
-  #        )
-  #        storm_control_policy = lookup(v, "storm_control_policy", local.lbundle.storm_control_policy)
-  #      }
-  #    ]
-  #  ]) : i.name => i
-  #}
-
 
   #__________________________________________________________
   #
@@ -509,36 +264,6 @@ locals {
   switches_leaf_policy_groups = {
     for v in lookup(local.sw_pgs_leaf, "policy_groups", {}) : v.name => merge(local.swpgl, v)
   }
-  #switches_leaf_policy_groups = {
-  #  for v in lookup(local.sw_pgs_leaf, "policy_groups", {}) : v.name => {
-  #    bfd_ipv4_policy          = lookup(v, "bfd_ipv4_policy", local.swpgl.bfd_ipv4_policy)
-  #    bfd_ipv6_policy          = lookup(v, "bfd_ipv6_policy", local.swpgl.bfd_ipv6_policy)
-  #    bfd_multihop_ipv4_policy = lookup(v, "bfd_multihop_ipv4_policy", local.swpgl.bfd_multihop_ipv4_policy)
-  #    bfd_multihop_ipv6_policy = lookup(v, "bfd_multihop_ipv6_policy", local.swpgl.bfd_multihop_ipv6_policy)
-  #    cdp_interface_policy     = lookup(v, "cdp_interface_policy", local.swpgl.cdp_interface_policy)
-  #    copp_leaf_policy         = lookup(v, "copp_leaf_policy", local.swpgl.copp_leaf_policy)
-  #    copp_pre_filter          = lookup(v, "copp_pre_filter", local.swpgl.copp_pre_filter)
-  #    description              = lookup(v, "description", local.swpgl.description)
-  #    dot1x_node_authentication_policy = lookup(
-  #      v, "dot1x_node_authentication_policy", local.swpgl.dot1x_node_authentication_policy
-  #    )
-  #    equipment_flash_config       = lookup(v, "equipment_flash_config", local.swpgl.equipment_flash_config)
-  #    fast_link_failover_policy    = lookup(v, "fast_link_failover_policy", local.swpgl.fast_link_failover_policy)
-  #    fibre_channel_node_policy    = lookup(v, "fibre_channel_node_policy", local.swpgl.fibre_channel_node_policy)
-  #    fibre_channel_san_policy     = lookup(v, "fibre_channel_san_policy", local.swpgl.fibre_channel_san_policy)
-  #    forward_scale_profile_policy = lookup(v, "forward_scale_profile_policy", local.swpgl.forward_scale_profile_policy)
-  #    lldp_interface_policy        = lookup(v, "lldp_interface_policy", local.swpgl.lldp_interface_policy)
-  #    monitoring_policy            = lookup(v, "monitoring_policy", local.swpgl.monitoring_policy)
-  #    netflow_node_policy          = lookup(v, "netflow_node_policy", local.swpgl.netflow_node_policy)
-  #    poe_node_policy              = lookup(v, "poe_node_policy", local.swpgl.poe_node_policy)
-  #    ptp_node_policy              = lookup(v, "ptp_node_policy", local.swpgl.ptp_node_policy)
-  #    spanning_tree_interface_policy = lookup(
-  #      v, "spanning_tree_interface_policy", local.swpgl.spanning_tree_interface_policy
-  #    )
-  #    synce_node_policy        = lookup(v, "synce_node_policy", local.swpgl.synce_node_policy)
-  #    usb_configuration_policy = lookup(v, "usb_configuration_policy", local.swpgl.usb_configuration_policy)
-  #  }
-  #}
 
 
   #__________________________________________________________
@@ -549,16 +274,6 @@ locals {
   spine_interface_policy_groups = {
     for v in lookup(local.intf_pg_spine, "policy_groups", {}) : v.name => merge(local.saccess, v)
   }
-  #spine_interface_policy_groups = {
-  #  for v in lookup(local.intf_pg_spine, "bundle", {}) : v.name => {
-  #    attachable_entity_profile = lookup(v, "attachable_entity_profile", local.saccess.attachable_entity_profile)
-  #    cdp_interface_policy      = lookup(v, "cdp_interface_policy", local.saccess.cdp_interface_policy)
-  #    description               = lookup(v, "description", local.saccess.description)
-  #    global_alias              = lookup(v, "global_alias", local.saccess.global_alias)
-  #    link_level_policy         = lookup(v, "link_level_policy", local.saccess.link_level_policy)
-  #    macsec_policy             = lookup(v, "macsec_policy", local.saccess.macsec_policy)
-  #  }
-  #}
 
   #__________________________________________________________
   #
@@ -568,18 +283,6 @@ locals {
   switches_spine_policy_groups = {
     for v in lookup(local.sw_pgs_spine, "policy_groups", {}) : v.name => merge(local.swpgs, v)
   }
-  #switches_spine_policy_groups = {
-  #  for v in lookup(local.sw_pgs_spine, "policy_groups", {}) : v.name => {
-  #    bfd_ipv4_policy          = lookup(v, "bfd_ipv4_policy", local.swpgs.bfd_ipv4_policy)
-  #    bfd_ipv6_policy          = lookup(v, "bfd_ipv6_policy", local.swpgs.bfd_ipv6_policy)
-  #    cdp_interface_policy     = lookup(v, "cdp_interface_policy", local.swpgs.cdp_interface_policy)
-  #    copp_pre_filter          = lookup(v, "copp_pre_filter", local.swpgs.copp_pre_filter)
-  #    copp_spine_policy        = lookup(v, "copp_spine_policy", local.swpgs.copp_spine_policy)
-  #    description              = lookup(v, "description", local.swpgs.description)
-  #    lldp_interface_policy    = lookup(v, "lldp_interface_policy", local.swpgs.lldp_interface_policy)
-  #    usb_configuration_policy = lookup(v, "usb_configuration_policy", local.swpgs.usb_configuration_policy)
-  #  }
-  #}
 
 
   #__________________________________________________________
@@ -639,7 +342,7 @@ locals {
   #__________________________________________________________
 
   vmm_domains = { for i in flatten([
-    for value in lookup(local.virtual_networking, "vmm", []) : [
+    for value in lookup(var.virtual_networking, "vmm", []) : [
       for v in value.domain : {
         access_mode           = lookup(v, "access_mode", local.vmm.domain.access_mode)
         control_knob          = lookup(v, "control_knob", local.vmm.domain.control_knob)
@@ -663,7 +366,7 @@ locals {
     ]
   ]) : i.dvs => i }
   vmm_credentials = { for i in flatten([
-    for value in lookup(local.virtual_networking, "vmm", []) : [
+    for value in lookup(var.virtual_networking, "vmm", []) : [
       for k, v in value.credentials : {
         dvs         = value.name
         description = lookup(v, "description", local.vmm.credentials.description)
@@ -673,7 +376,7 @@ locals {
   ]) : i.dvs => i }
   vmm_controllers = {
     for i in flatten([
-      for value in lookup(local.virtual_networking, "vmm", []) : [
+      for value in lookup(var.virtual_networking, "vmm", []) : [
         for v in value.controllers : {
           datacenter     = lookup(v, "datacenter", local.vmm.controllers.datacenter)
           dvs            = value.name
@@ -698,7 +401,7 @@ locals {
     ]) : "${i.dvs}:${i.hostname}" => i
   }
   vswitch_policies = { for i in flatten([
-    for value in lookup(local.virtual_networking, "vmm", []) : [
+    for value in lookup(var.virtual_networking, "vmm", []) : [
       for k, v in value.vswitch_policy : {
         cdp_interface_policy = lookup(v, "cdp_interface_policy", "")
         dvs                  = value.name

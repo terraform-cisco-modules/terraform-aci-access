@@ -25,9 +25,6 @@ defaults:
             mcp_interface_policy: default
             monitoring_policy: default
             name: '**REQUIRED**'
-            netflow_monitor_policies:
-              ip_filter_type: ipv4
-              netflow_monitor_policy: '**REQUIRED**'
             poe_interface_policy: default
             port_security_policy: default
             priority_flow_control_policy: default
@@ -59,9 +56,6 @@ defaults:
             mcp_interface_policy: default
             monitoring_policy: default
             name: '**REQUIRED**'
-            netflow_monitor_policies:
-              ip_filter_type: ipv4
-              netflow_monitor_policy: '**REQUIRED**'
             port_channel_policy: default
             port_security_policy: default
             priority_flow_control_policy: default
@@ -70,6 +64,9 @@ defaults:
             span_source_groups: []
             spanning_tree_interface_policy: default
             storm_control_policy: default
+          netflow_monitor_policies:
+            ip_filter_type: ipv4
+            netflow_monitor_policy: '**REQUIRED**'
       spine:
         policy_groups:
           attachable_entity_profile: '**REQUIRED**'
@@ -105,14 +102,14 @@ defaults:
           l3out: ''
           mode: visible
           tenant: infra
-        error_disabled_recovery:
+        error_disabled_recovery_policy:
           error_disable_recovery_interval: 300
           events:
             bpdu_guard: true
             frequent_endpoint_move: true
             loop_indication_by_mcp: true
           name: default
-        mcp_instance:
+        mcp_instance_policy:
           admin_state: enabled
           description: ''
           enable_mcp_pdu_per_vlan: true
@@ -135,14 +132,15 @@ defaults:
           micro_burst_leaf_queues: 0
           name: default
           preserve_cos: true
-        vpc_domain_policy:
+        vpc_domain:
+          description: ''
           delay_restore_timer: 120
           peer_dead_interval: 120
-        recommended_settings:
-          error_disabled_recovery: false
-          mcp_instance: false
+        recommended_policies:
+          error_disabled_recovery_policy: false
+          mcp_instance_policy: false
           qos_class: false
-          vpc_domain_policy: false
+          vpc_domain: false
       # INTERFACE POLICIES
       interface:
         cdp_interface:
@@ -166,7 +164,7 @@ defaults:
           reflective_relay: disabled
           vlan_scope: global
         link_level:
-          auto_negotiation: on
+          auto_negotiation: "on"
           description: ''
           emi_retrain: disable
           forwarding_error_correction: inherit
@@ -326,69 +324,69 @@ defaults:
         - name: inheritAuto
           description: 'Speed Auto Negotiation Auto'
         - name: inheritnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed Auto Negotiation Off'
         - name: 100MAuto
           description: 'Speed 100M Negotiation Auto'
           speed: 100M
         - name: 100MnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 100M Negotiation Off'
           speed: 100M
         - name: 1GAuto
           description: 'Speed 1G Negotiation Auto'
           speed: 1G
         - name: 1GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 1G Negotiation Off'
           speed: 1G
         - name: 10GAuto
           description: 'Speed 10G Negotiation Auto'
           speed: 10G
         - name: 10GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 10G Negotiation Off'
           speed: 10G
         - name: 25GAuto
           description: 'Speed 25G Negotiation Auto'
           speed: 25G
         - name: 25GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 25G Negotiation Off'
           speed: 25G
         - name: 40GAuto
           description: 'Speed 40G Negotiation Auto'
           speed: 40G
         - name: 40GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 40G Negotiation Off'
           speed: 40G
         - name: 50GAuto
           description: 'Speed 50G Negotiation Auto'
           speed: 50G
         - name: 50GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 50G Negotiation Off'
           speed: 50G
         - name: 100GAuto
           description: 'Speed 100G Negotiation Auto'
           speed: 100G
         - name: 100GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 100G Negotiation Off'
           speed: 100G
         - name: 200GAuto
           description: 'Speed 200G Negotiation Auto'
           speed: 200G
         - name: 200GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 200G Negotiation Off'
           speed: 200G
         - name: 400GAuto
           description: 'Speed 400G Negotiation Auto'
           speed: 400G
         - name: 400GnoNg
-          auto_negotiation: off
+          auto_negotiation: "off"
           description: 'Speed 400G Negotiation Off'
           speed: 400G
       lldp_interface:
@@ -425,7 +423,7 @@ defaults:
           mode: mac-pin-nicload
         - name: static
           description: 'Static'
-          mode: off
+          mode: "off"
       port_security:
         - name: default
           description: 'Default Port Security Policy'

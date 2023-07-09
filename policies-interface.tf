@@ -86,7 +86,7 @@ ________________________________________________________________________________
 */
 resource "aci_fabric_if_pol" "map" {
   for_each      = local.link_level
-  auto_neg      = each.value.auto_negotiation == true ? "on" : "off"
+  auto_neg      = each.value.auto_negotiation
   description   = each.value.description
   fec_mode      = each.value.forwarding_error_correction
   link_debounce = each.value.link_debounce_interval

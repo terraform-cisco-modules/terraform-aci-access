@@ -136,7 +136,7 @@ resource "aci_mcp_instance_policy" "map" {
   init_delay_time  = each.value.initial_delay
   key              = var.mcp_instance_key
   loop_detect_mult = each.value.loop_detect_multiplication_factor
-  loop_protect_act = each.value.loop_protection_disable_port == true ? "port-disable" : "none"
+  loop_protect_act = each.value.loop_protect_action == true ? "port-disable" : "none"
   tx_freq          = each.value.transmission_frequency.seconds
   tx_freq_msec     = each.value.transmission_frequency.msec
 }
