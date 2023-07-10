@@ -94,8 +94,8 @@ locals {
   attachable_access_entity_profiles = {
     for k, v in lookup(local.global, "attachable_access_entity_profiles", {}) : v.name => {
       access_or_native_vlan = lookup(v, "access_or_native_vlan", 0)
-      allowed_vlans = lookup(v, "allowed_vlans", "")
-      description = lookup(v, "description", local.aaep.description)
+      allowed_vlans         = lookup(v, "allowed_vlans", "")
+      description           = lookup(v, "description", local.aaep.description)
       domains = compact(concat(
         [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.map["${i}"].id],
         [for i in lookup(v, "physical_domains", []) : aci_physical_domain.map["${i}"].id],

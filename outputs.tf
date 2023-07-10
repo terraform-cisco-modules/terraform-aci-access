@@ -84,9 +84,9 @@ output "global" {
 output "aaep_to_epgs" {
   value = { for k, v in local.attachable_access_entity_profiles : k => {
     access_or_native_vlan = v.access_or_native_vlan
-    allowed_vlans = v.allowed_vlans
-    name = k
-  }}
+    allowed_vlans         = v.allowed_vlans
+    name                  = k
+  } }
 }
 
 /*_____________________________________________________________________________________________________________________
