@@ -3,38 +3,38 @@
 Interface — Outputs
 _______________________________________________________________________________________________________________________
 */
-#output "interface" {
-#  description = <<-EOT
-#    Interface Identifiers
-#      leaf_interfaces:
-#        policy_groups
-#          access:   Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => Leaf Access Port.
-#          breakout: Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => Leaf Breakout Port Group.
-#          bundle:   Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => [ VPC Interface | VPC Interface ].
-#      spine_interfaces:
-#        policy_groups: Fabric => Access Policies => Interfaces => Spine Interfaces => Policy Groups
-#  EOT
-#  value = {
-#    leaf_interfaces = {
-#      policy_groups = {
-#        access = {
-#          for v in sort(keys(aci_leaf_access_port_policy_group.map)) : v => aci_leaf_access_port_policy_group.map[v].id
-#        }
-#        breakout = {
-#          for v in sort(keys(aci_leaf_breakout_port_group.map)) : v => aci_leaf_breakout_port_group.map[v].id
-#        }
-#        bundle = {
-#          for v in sort(keys(aci_leaf_access_bundle_policy_group.map)) : v => aci_leaf_access_bundle_policy_group.map[v].id
-#        }
-#      }
-#    }
-#    spine_interfaces = {
-#      policy_groups = {
-#        for v in sort(keys(aci_spine_port_policy_group.map)) : v => aci_spine_port_policy_group.map[v].id
-#      }
-#    }
-#  }
-#}
+output "interface" {
+  description = <<-EOT
+    Interface Identifiers
+      leaf_interfaces:
+        policy_groups
+          access:   Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => Leaf Access Port.
+          breakout: Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => Leaf Breakout Port Group.
+          bundle:   Fabric => Access Policies => Interfaces => Leaf Interfaces => Policy Groups => [ VPC Interface | VPC Interface ].
+      spine_interfaces:
+        policy_groups: Fabric => Access Policies => Interfaces => Spine Interfaces => Policy Groups
+  EOT
+  value = {
+    leaf_interfaces = {
+      policy_groups = {
+        access = {
+          for v in sort(keys(aci_leaf_access_port_policy_group.map)) : v => aci_leaf_access_port_policy_group.map[v].id
+        }
+        breakout = {
+          for v in sort(keys(aci_leaf_breakout_port_group.map)) : v => aci_leaf_breakout_port_group.map[v].id
+        }
+        bundle = {
+          for v in sort(keys(aci_leaf_access_bundle_policy_group.map)) : v => aci_leaf_access_bundle_policy_group.map[v].id
+        }
+      }
+    }
+    spine_interfaces = {
+      policy_groups = {
+        for v in sort(keys(aci_spine_port_policy_group.map)) : v => aci_spine_port_policy_group.map[v].id
+      }
+    }
+  }
+}
 
 
 /*_____________________________________________________________________________________________________________________
@@ -81,6 +81,13 @@ output "global" {
   }
 }
 
+output "aaep_to_epgs" {
+  value = { for k, v in local.attachable_access_entity_profiles : k => {
+    access_or_native_vlan = v.access_or_native_vlan
+    allowed_vlans = v.allowed_vlans
+    name = k
+  }}
+}
 
 /*_____________________________________________________________________________________________________________________
 

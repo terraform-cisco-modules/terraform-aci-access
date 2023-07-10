@@ -88,7 +88,10 @@ defaults:
       # GLOBAL POLICIES
       global:
         attachable_access_entity_profiles:
+          access_or_native_vlan: null
+          allowed_vlans: ''
           description: ''
+          instrumentation_immediacy: on-demand
           l3_domains: []
           name: '**REQUIRED**'
           physical_domains: []
