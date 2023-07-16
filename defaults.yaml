@@ -97,7 +97,7 @@ defaults:
           physical_domains: []
           vmm_domains: []
         dhcp_relay:
-          name_addr_list: ['**REQUIRED**']
+          dhcp_servers: ['**REQUIRED**']
           description: ''
           application_profile: default
           epg: '**REQUIRED**'
@@ -138,7 +138,7 @@ defaults:
         vpc_domain:
           description: ''
           delay_restore_timer: 120
-          peer_dead_interval: 120
+          peer_dead_interval: 200
         recommended_policies:
           error_disabled_recovery_policy: false
           mcp_instance_policy: false
