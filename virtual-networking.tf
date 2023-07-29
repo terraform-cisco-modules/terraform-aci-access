@@ -46,7 +46,7 @@ resource "aci_rest_managed" "vmm_uplinks" {
   ]
   for_each   = local.vmm_uplinks
   class_name = "vmmUplinkP"
-  dn         = "uni/vmmp-${each.value.switch_provider}/dom-${each.value.dvs}/uplinkpcont/uplinkp-${each.value.uplinkId}"
+  dn         = "uni/vmmp-${each.value.switch_provider}/dom-${each.value.domain}/uplinkpcont/uplinkp-${each.value.uplinkId}"
   content = {
     uplinkId   = each.value.uplinkId
     uplinkName = each.value.uplinkName
@@ -68,8 +68,8 @@ resource "aci_vmm_credential" "map" {
   ]
   for_each      = local.vmm_credentials
   description   = each.value.description
-  name          = each.value.dvs
-  vmm_domain_dn = aci_vmm_domain.map[each.value.dvs].id
+  name          = each.value.name
+  vmm_domain_dn = aci_vmm_domain.map[each.value.domain].id
   pwd           = var.vmm_password
   usr           = each.value.username
 }
@@ -89,7 +89,7 @@ resource "aci_vmm_controller" "map" {
     aci_vmm_domain.map
   ]
   for_each            = local.vmm_controllers
-  vmm_domain_dn       = aci_vmm_domain.map[each.value.dvs].id
+  vmm_domain_dn       = aci_vmm_domain.map[each.value.domain].id
   name                = each.value.hostname
   dvs_version         = each.value.dvs_version
   host_or_ip          = each.value.hostname
@@ -101,7 +101,7 @@ resource "aci_vmm_controller" "map" {
   seq_num             = each.value.sequence_number
   stats_mode          = each.value.stats_collection
   vxlan_depl_pref     = each.value.switch_mode == "nsx" ? "nsx" : "vxlan"
-  relation_vmm_rs_acc = aci_vmm_credential.map[each.value.dvs].id
+  relation_vmm_rs_acc = aci_vmm_credential.map[each.value.dn_key].id
   # relation_vmm_rs_ctrlr_p_mon_pol = length(compact([each.value.monitoring_policy])
   # ) > 0 ? "uni/infra/moninfra-${each.value.monitoring_policy}" : ""
   # relation_vmm_rs_mgmt_e_pg = "uni/tn-mgmt/mgmtp-default/${each.value.mgmt_epg_type}-${each.value.management_epg}"
@@ -124,23 +124,48 @@ resource "aci_vswitch_policy" "map" {
     aci_vmm_domain.map
   ]
   for_each      = local.vswitch_policies
-  vmm_domain_dn = aci_vmm_domain.map[each.value.dvs].id
+  vmm_domain_dn = aci_vmm_domain.map[each.value.domain].id
   dynamic "relation_vmm_rs_vswitch_exporter_pol" {
-    for_each = { for v in each.value.netflow_export_policy : v.netflow_policy => v }
+    for_each = { for v in [each.value.netflow_export_policy_parameters] : v.netflow_export_policy => v if v.create == true }
     content {
       active_flow_time_out = relation_vmm_rs_vswitch_exporter_pol.value.active_flow_timeout
       idle_flow_time_out   = relation_vmm_rs_vswitch_exporter_pol.value.idle_flow_timeout
-      sampling_rate        = relation_vmm_rs_vswitch_exporter_pol.value.sampling_rate
-      target_dn            = "uni/infra/vmmexporterpol-${relation_vmm_rs_vswitch_exporter_pol.value.netflow_policy}"
+      sampling_rate        = relation_vmm_rs_vswitch_exporter_pol.value.sample_rate
+      target_dn            = "uni/infra/vmmexporterpol-${relation_vmm_rs_vswitch_exporter_pol.value.netflow_export_policy}"
     }
   }
-  relation_vmm_rs_vswitch_override_cdp_if_pol = length(compact([each.value.cdp_interface_policy])
-  ) > 0 ? "uni/infra/cdpIfP-${each.value.cdp_interface_policy}" : ""
+  relation_vmm_rs_vswitch_override_cdp_if_pol = length(compact([each.value.cdp_policy])
+  ) > 0 ? "uni/infra/cdpIfP-${each.value.cdp_policy}" : ""
   relation_vmm_rs_vswitch_override_fw_pol = length(compact([each.value.firewall_policy])
   ) > 0 ? "uni/infra/fwP-${each.value.firewall_policy}" : ""
   relation_vmm_rs_vswitch_override_lacp_pol = length(compact([each.value.port_channel_policy])
   ) > 0 ? "uni/infra/lacplagp-${each.value.port_channel_policy}" : ""
-  relation_vmm_rs_vswitch_override_lldp_if_pol = length(compact([each.value.lldp_interface_policy])
-  ) > 0 ? "uni/infra/lldpIfP-${each.value.lldp_interface_policy}" : ""
+  relation_vmm_rs_vswitch_override_lldp_if_pol = length(compact([each.value.lldp_policy])
+  ) > 0 ? "uni/infra/lldpIfP-${each.value.lldp_policy}" : ""
   relation_vmm_rs_vswitch_override_mtu_pol = "uni/fabric/l2pol-${each.value.mtu_policy}"
+}
+
+/*_____________________________________________________________________________________________________________________
+
+API Information:
+ - Class: "vmmVSwitchPolicyCont"
+ - Distinguished Name: "uni/vmmp-{switch_provider}/dom-{name}/vswitchpolcont"
+GUI Location:
+ - Virtual Networking -> {switch_provider} -> {domain_name} -> VSwitch Policy
+_______________________________________________________________________________________________________________________
+*/
+resource "aci_rest_managed" "vmm_ehanced_lag_policies" {
+  depends_on = [
+    aci_vswitch_policy.map
+  ]
+  for_each   = local.enhanced_lag_policies
+  class_name = "lacpEnhancedLagPol"
+  dn         = "uni/vmmp-${each.value.switch_provider}/dom-${each.value.domain}/enlacplagp-${each.value.name}"
+  content = {
+    id       = each.value.id
+    lbmode   = each.value.load_balancing_mode
+    mode     = each.value.mode
+    name     = each.value.name
+    numLinks = each.value.number_of_links
+  }
 }

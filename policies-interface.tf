@@ -203,7 +203,7 @@ resource "aci_lacp_policy" "map" {
   max_links   = each.value.maximum_number_of_links
   min_links   = each.value.minimum_number_of_links
   name        = each.key
-  #mode        = each.value.mode
+  mode        = each.value.mode
 }
 
 /*_____________________________________________________________________________________________________________________
@@ -257,15 +257,9 @@ ________________________________________________________________________________
 */
 resource "aci_spanning_tree_interface_policy" "map" {
   for_each = local.spanning_tree_interface
-  ctrl = alltrue(concat(
-    [each.value.bpdu_filter == "enabled" ? true : false],
-    [each.value.bpdu_guard == "enabled" ? true : false]
-    )) ? ["bpdu-filter", "bpdu-guard"] : anytrue(concat(
-    [each.value.bpdu_filter == "enabled" ? true : false],
-    [each.value.bpdu_guard == "enabled" ? true : false]
-    )) ? compact(
-    [each.value.bpdu_filter == "enabled" ? "bpdu-filter" : ""],
-    [each.value.bpdu_guard == "enabled" ? "bpdu-guard" : ""]
+  ctrl = length(compact([each.value.bpdu_filter, each.value.bpdu_guard])) > 0 ? compact([
+    each.value.bpdu_filter == "enabled" ? "bpdu-filter" : "",
+    each.value.bpdu_guard == "enabled" ? "bpdu-guard" : ""]
   ) : ["unspecified"]
   description = each.value.description
   name        = each.key
