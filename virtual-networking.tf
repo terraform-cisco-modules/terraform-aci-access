@@ -2,7 +2,7 @@
 
 API Information:
  - Class: "vmmDomP"
- - Distinguished Name: "uni/vmmp-{switch_provider}/dom-{name}
+ - Distinguished Name: "uni/vmmp-{switch_provider}/dom-{name}"
 GUI Location:
  - Virtual Networking -> {switch_provider} -> {domain_name}
 _______________________________________________________________________________________________________________________
@@ -148,7 +148,7 @@ resource "aci_vswitch_policy" "map" {
 /*_____________________________________________________________________________________________________________________
 
 API Information:
- - Class: "vmmVSwitchPolicyCont"
+ - Class: "lacpEnhancedLagPol"
  - Distinguished Name: "uni/vmmp-{switch_provider}/dom-{name}/vswitchpolcont"
 GUI Location:
  - Virtual Networking -> {switch_provider} -> {domain_name} -> VSwitch Policy
