@@ -101,7 +101,6 @@ API Information:
  - Distinguished Name: "uni/infra/hintfpol-{name}/alias"
 GUI Location:
  - Fabric > Access Policies > Policies > Interface > Link Level : {name}: alias
-
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "link_level_global_alias" {
@@ -140,7 +139,6 @@ API Information:
  - Distinguished Name: "uni/infra/lldpIfP-{name}/alias"
 GUI Location:
  - Fabric > Access Policies > Policies > Interface > Link Level : {name}: alias
-
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "lldp_interface_global_alias" {
@@ -213,7 +211,6 @@ API Information:
  - Distinguished Name: "uni/infra/lacplagp-{name}/alias"
 GUI Location:
  - Fabric > Access Policies > Policies > Interface > Port Channel : {name}: alias
-
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "port_channel_global_alias" {
@@ -272,7 +269,6 @@ API Information:
  - Distinguished Name: "uni/infra/ifPol-{name}/alias"
 GUI Location:
  - Fabric > Access Policies > Policies > Interface > Spanning Tree Interface : {name}: alias
-
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "spanning_tree_interface_global_alias" {

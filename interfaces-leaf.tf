@@ -29,6 +29,7 @@ resource "aci_leaf_access_port_policy_group" "map" {
   # class: cdpIfPol
   relation_infra_rs_cdp_if_pol = length(compact([each.value.cdp_interface_policy])
   ) > 0 ? "uni/infra/cdpIfP-${each.value.cdp_interface_policy}" : ""
+  # class: coppIfPol
   relation_infra_rs_copp_if_pol = length(compact([each.value.copp_interface_policy])
   ) > 0 ? "uni/infra/coppifpol-${each.value.copp_interface_policy}" : ""
   # class: dwdmIfPol
@@ -84,12 +85,12 @@ resource "aci_leaf_access_port_policy_group" "map" {
   # class: qosSdIfPol
   relation_infra_rs_qos_sd_if_pol = length(compact([each.value.slow_drain_policy])
   ) > 0 ? "uni/infra/qossdpol-${each.value.slow_drain_policy}" : ""
-  # class: spanVDestGrp
-  relation_infra_rs_span_v_dest_grp = length(compact(each.value.span_destination_groups)
-  ) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vdestgrp-${s}"] : []
-  # class: spanVSrcGrp
-  relation_infra_rs_span_v_src_grp = length(compact(each.value.span_source_groups)
-  ) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vsrcgrp-${s}"] : []
+  ## class: spanVDestGrp
+  #relation_infra_rs_span_v_dest_grp = length(compact(each.value.vspan_destination_groups)
+  #) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vdestgrp-${s}"] : []
+  ## class: spanVSrcGrp
+  #relation_infra_rs_span_v_src_grp = length(compact(each.value.vspan_source_groups)
+  #) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vsrcgrp-${s}"] : []
   # class: stormctrlIfPol
   relation_infra_rs_stormctrl_if_pol = length(compact([each.value.storm_control_policy])
   ) > 0 ? "uni/infra/stormctrlifp-${each.value.storm_control_policy}" : ""
@@ -221,12 +222,12 @@ resource "aci_leaf_access_bundle_policy_group" "map" {
   # class: qosSdIfPol
   relation_infra_rs_qos_sd_if_pol = length(compact([each.value.slow_drain_policy])
   ) > 0 ? "uni/infra/qossdpol-${each.value.slow_drain_policy}" : ""
-  # class: spanVDestGrp
-  relation_infra_rs_span_v_dest_grp = length(compact(each.value.span_destination_groups)
-  ) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vdestgrp-${s}"] : []
-  # class: spanVSrcGrp
-  relation_infra_rs_span_v_src_grp = length(compact(each.value.span_source_groups)
-  ) > 0 ? [for s in each.value.span_source_groups : "uni/infra/vsrcgrp-${s}"] : []
+  ## class: spanVDestGrp
+  #relation_infra_rs_span_v_dest_grp = length(compact(each.value.vspan_destination_groups)
+  #) > 0 ? [for s in each.value.vspan_destination_groups : "uni/infra/vdestgrp-${s}"] : []
+  ## class: spanVSrcGrp
+  #relation_infra_rs_span_v_src_grp = length(compact(each.value.vspan_source_groups)
+  #) > 0 ? [for s in each.value.vspan_source_groups : "uni/infra/vsrcgrp-${s}"] : []
   # class: stormctrlIfPol
   relation_infra_rs_stormctrl_if_pol = length(compact([each.value.storm_control_policy])
   ) > 0 ? "uni/infra/stormctrlifp-${each.value.storm_control_policy}" : ""

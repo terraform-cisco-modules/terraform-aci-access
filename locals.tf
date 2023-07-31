@@ -125,17 +125,17 @@ locals {
     ]
   ]) : "${i.new_key}" => i }
 
-  error_disabled_recovery = local.rss.error_disabled_recovery_policy == false && length(lookup(
+  error_disabled_recovery_policy = local.rss.error_disabled_recovery_policy == false && length(lookup(
     local.global, "error_disabled_recovery_policy", {})) > 0 ? merge(
     { create = true }, local.recovery, lookup(local.global, "error_disabled_recovery_policy", {},
     { events = merge(local.recovery.events, lookup(lookup(local.global, "error_disabled_recovery_policy", {}), "events", {})) })
     ) : length(regexall(true, local.rss.error_disabled_recovery_policy)
   ) > 0 ? merge({ create = true }, local.recovery) : merge({ create = false }, local.recovery)
 
-  mcp_instance = local.rss.mcp_instance_policy == false && length(lookup(local.global, "mcp_instance_policy", {})
-    ) > 0 ? merge({ create = true }, local.mcpi, lookup(local.global, "mcp_instance_policy", {}),
+  mcp_instance_policy_default = local.rss.mcp_instance_policy_default == false && length(lookup(local.global, "mcp_instance_policy_default", {})
+    ) > 0 ? merge({ create = true }, local.mcpi, lookup(local.global, "mcp_instance_policy_default", {}),
     { transmission_frequency = merge(local.mcpi.transmission_frequency, lookup(lookup(
-      local.global, "mcp_instance_policy", {}), "transmission_frequency", {}))
+      local.global, "mcp_instance_policy_default", {}), "transmission_frequency", {}))
     }) : length(regexall(true, local.rss.mcp_instance_policy)
   ) > 0 ? merge({ create = true }, local.mcpi) : merge({ create = false }, local.mcpi)
 

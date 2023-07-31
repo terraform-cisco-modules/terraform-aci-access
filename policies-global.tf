@@ -41,7 +41,7 @@ resource "aci_access_generic" "map" {
 
 API Information:
  - Class: "dhcpRelayP"
- - Distinguised Name: "uni/infra-{name}/relayp-{name}"
+ - Distinguised Name: "uni/infra/relayp-{name}"
 GUI Location:
  - Fabric > Access Policies > Policies > Global > DHCP Relay > {name}
 _______________________________________________________________________________________________________________________
@@ -100,7 +100,7 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_error_disable_recovery" "map" {
-  for_each            = { for v in [local.error_disabled_recovery] : "default" => v if v.create == true }
+  for_each            = { for v in [local.error_disabled_recovery_policy] : "default" => v if v.create == true }
   err_dis_recov_intvl = each.value.error_disable_recovery_interval
   edr_event {
     event   = "event-bpduguard"
@@ -127,7 +127,7 @@ ________________________________________________________________________________
 */
 resource "aci_mcp_instance_policy" "map" {
   for_each = {
-    for v in [local.mcp_instance] : "default" => v if v.create == true
+    for v in [local.mcp_instance_policy_default] : "default" => v if v.create == true
   }
   admin_st = each.value.admin_state
   ctrl = length(regexall(true, each.value.enable_mcp_pdu_per_vlan)
@@ -148,7 +148,6 @@ API Information:
  - Distinguished Name: "uni/infra/qosinst-default"
 GUI Location:
  - Fabric > Access Policies > Policies > Global > QOS Class
-
 _______________________________________________________________________________________________________________________
 */
 resource "aci_qos_instance_policy" "map" {

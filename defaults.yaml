@@ -29,8 +29,8 @@ defaults:
             port_security_policy: default
             priority_flow_control_policy: default
             slow_drain_policy: default
-            span_destination_groups: []
-            span_source_groups: []
+            #span_destination_groups: []
+            #span_source_groups: []
             spanning_tree_interface_policy: default
             storm_control_policy: default
             synce_interface_policy: default
@@ -60,8 +60,8 @@ defaults:
             port_security_policy: default
             priority_flow_control_policy: default
             slow_drain_policy: default
-            span_destination_groups: []
-            span_source_groups: []
+            #span_destination_groups: []
+            #span_source_groups: []
             spanning_tree_interface_policy: default
             storm_control_policy: default
           netflow_monitor_policies:
@@ -112,7 +112,7 @@ defaults:
             frequent_endpoint_move: true
             loop_indication_by_mcp: true
           name: default
-        mcp_instance_policy:
+        mcp_instance_policy_default:
           admin_state: enabled
           description: ''
           enable_mcp_pdu_per_vlan: true
@@ -141,7 +141,7 @@ defaults:
           peer_dead_interval: 200
         recommended_policies:
           error_disabled_recovery_policy: false
-          mcp_instance_policy: false
+          mcp_instance_policy_default: false
           qos_class: false
           vpc_domain: false
       # INTERFACE POLICIES
