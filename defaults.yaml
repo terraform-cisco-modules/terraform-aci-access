@@ -71,6 +71,7 @@ defaults:
         policy_groups:
           attachable_entity_profile: '**REQUIRED**'
           cdp_interface_policy: default
+          copp_interface_policy: default
           description: ''
           global_alias: ''
           link_level_policy: default
@@ -461,7 +462,7 @@ defaults:
         monitoring_policy: 'default'
         name: '' # If Undefined use Hostname
         port: 0
-        sequence_number: 0
+        sequence_number: 1
         stats_collection: 'disabled'
         trigger_inventory_sync: 'untriggered'
         vxlan_pool: ''

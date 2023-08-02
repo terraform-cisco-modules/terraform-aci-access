@@ -40,7 +40,7 @@ locals {
   # Defaults: Policies -> Global
   aaep     = local.defaults.access.policies.global.attachable_access_entity_profiles
   dhcp     = local.defaults.access.policies.global.dhcp_relay
-  mcpi     = local.defaults.access.policies.global.mcp_instance_policy
+  mcpi     = local.defaults.access.policies.global.mcp_instance_policy_default
   recovery = local.defaults.access.policies.global.error_disabled_recovery_policy
   qos      = local.defaults.access.policies.global.qos_class
   vpcp     = local.defaults.access.policies.global.vpc_domain
@@ -136,7 +136,7 @@ locals {
     ) > 0 ? merge({ create = true }, local.mcpi, lookup(local.global, "mcp_instance_policy_default", {}),
     { transmission_frequency = merge(local.mcpi.transmission_frequency, lookup(lookup(
       local.global, "mcp_instance_policy_default", {}), "transmission_frequency", {}))
-    }) : length(regexall(true, local.rss.mcp_instance_policy)
+    }) : length(regexall(true, local.rss.mcp_instance_policy_default)
   ) > 0 ? merge({ create = true }, local.mcpi) : merge({ create = false }, local.mcpi)
 
   qos_class = local.rss.qos_class == false && length(lookup(local.global, "qos_class", {})

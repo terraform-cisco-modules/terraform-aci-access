@@ -22,6 +22,9 @@ resource "aci_spine_port_policy_group" "map" {
   # class: cdpIfPol
   relation_infra_rs_cdp_if_pol = length(compact([each.value.cdp_interface_policy])
   ) > 0 ? "uni/infra/cdpIfP-${each.value.cdp_interface_policy}" : ""
+  # class: coppIfPol
+  relation_infra_rs_copp_if_pol = length(compact([each.value.copp_interface_policy])
+  ) > 0 ? "uni/infra/coppifpol-${each.value.copp_interface_policy}" : ""
   # class: fabricHIfPol
   relation_infra_rs_h_if_pol = length(compact([each.value.link_level_policy])
   ) > 0 ? "uni/infra/hintfpol-${each.value.link_level_policy}" : ""
