@@ -9,6 +9,7 @@ ________________________________________________________________________________
 */
 resource "aci_vlan_pool" "vlan_pools" {
   for_each    = local.vlan_pools
+  annotation  = "orchestrator:terraform"
   alloc_mode  = each.value.allocation_mode
   description = each.value.description
   name        = each.key

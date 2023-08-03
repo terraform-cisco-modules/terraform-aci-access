@@ -14,6 +14,7 @@ resource "aci_spine_port_policy_group" "map" {
     aci_fabric_if_pol.map,
   ]
   for_each    = local.spine_interface_policy_groups
+  annotation  = "orchestrator:terraform"
   description = each.value.description
   name        = each.key
   # class: infraAttEntityP
