@@ -135,7 +135,7 @@ defaults:
           micro_burst_spine_queues: 0
           micro_burst_leaf_queues: 0
           name: default
-          preserve_cos: true
+          preserve_cos: false
         vpc_domain:
           description: ''
           delay_restore_timer: 120
