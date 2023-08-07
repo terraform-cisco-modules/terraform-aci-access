@@ -70,7 +70,7 @@ resource "aci_vmm_credential" "map" {
   description   = each.value.description
   name          = each.value.name
   vmm_domain_dn = aci_vmm_domain.map[each.value.domain].id
-  pwd           = var.vmm_password
+  pwd           = var.access_sensitive.virtual_networking.password[each.value.password]
   usr           = each.value.username
 }
 

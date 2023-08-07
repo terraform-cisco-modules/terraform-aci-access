@@ -4,15 +4,16 @@ locals {
   # Model Inputs
   #__________________________________________________________
 
-  defaults           = yamldecode(file("${path.module}/defaults.yaml")).defaults
-  domains            = lookup(var.access, "physical_and_external_domains", {})
-  global             = lookup(lookup(var.access, "policies", {}), "global", {})
-  interface          = lookup(lookup(var.access, "policies", {}), "interface", {})
-  intf_pg_leaf       = lookup(lookup(var.access, "interfaces", {}), "leaf", {})
-  intf_pg_spine      = lookup(lookup(var.access, "interfaces", {}), "spine", {})
-  pools              = lookup(var.access, "pools", {})
-  virtual_networking = lookup(var.virtual_networking, "virtual_networking", {})
-  pre_built          = local.defaults.access.pre_built_interface_policies
+  apic_version  = var.access.controller.version
+  defaults      = yamldecode(file("${path.module}/defaults.yaml")).defaults
+  domains       = lookup(var.access, "physical_and_external_domains", {})
+  global        = lookup(lookup(var.access, "policies", {}), "global", {})
+  interface     = lookup(lookup(var.access, "policies", {}), "interface", {})
+  intf_pg_leaf  = lookup(lookup(var.access, "interfaces", {}), "leaf", {})
+  intf_pg_spine = lookup(lookup(var.access, "interfaces", {}), "spine", {})
+  mgmt_epgs     = var.access.management_epgs
+  pools         = lookup(var.access, "pools", {})
+  pre_built     = local.defaults.access.pre_built_interface_policies
   pre_cfg = lookup(local.interface, "create_pre_built_interface_policies", {
     cdp_interface           = false
     fibre_channel_interface = false
@@ -54,8 +55,6 @@ locals {
   pc   = local.defaults.access.policies.interface.port_channel
   ps   = local.defaults.access.policies.interface.port_security
   stp  = local.defaults.access.policies.interface.spanning_tree_interface
-  # Defaults: Policies -> Switches
-  vpc = local.defaults.access.policies.switch.vpc_domain
   # Defaults: Switches -> Policy Groups
   swpgl = local.defaults.access.switches.leaf.policy_groups
   swpgs = local.defaults.access.switches.spine.policy_groups
@@ -123,7 +122,7 @@ locals {
         new_key             = "${v.epg_type}:${v.epg}:${s}"
       }
     ]
-  ]) : "${i.new_key}" => i }
+  ]) : i.new_key => i }
 
   error_disabled_recovery_policy = local.rss.error_disabled_recovery_policy == false && length(lookup(
     local.global, "error_disabled_recovery_policy", {})) > 0 ? merge(
@@ -344,7 +343,7 @@ locals {
   # Virtual Networking Variables
   #__________________________________________________________
 
-  vmm_domains = { for v in lookup(var.virtual_networking, "domains", []) : v.name => merge(
+  vmm_domains = { for v in lookup(var.access, "domains", []) : v.name => merge(
     local.vmm, v,
     { controllers  = lookup(v, "controllers", [])
       numOfUplinks = length(lookup(v, "uplink_names", local.vmm.uplink_names))
@@ -365,7 +364,7 @@ locals {
             credentials = merge(local.vmm.controllers.credentials, e.credentials)
             domain      = k
             dn_key      = "${k}:${e.hostname}:${lookup(lookup(e, "credentials", {}), "name", element(split("@", e.credentials.username), 0))}"
-            mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
+            mgmt_epg_type = local.mgmt_epgs[index(local.mgmt_epgs[*].name,
               lookup(e, "management_epg", local.vmm.controllers.management_epg))
             ].type
             switch_mode     = v.switch_mode
@@ -382,6 +381,7 @@ locals {
         description = lookup(e, "description", local.vmm.controllers.credentials.description)
         domain      = v.domain
         name        = length(compact([e.name])) > 0 ? e.name : element(split("@", e.username), 0)
+        password    = e.password
         username    = e.username
         user_split  = element(split("@", e.username), 0)
       }

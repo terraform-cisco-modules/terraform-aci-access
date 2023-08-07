@@ -10,7 +10,7 @@ A Terraform module to configure ACI Access Policies.
 
 ### A comprehensive example using this module is available below:
 
-## [Easy ACI](https://github.com/terraform-cisco-modules/easy-aci-complete)
+## [Easy ACI](https://github.com/terraform-cisco-modules/easy-aci)
 
 ## Requirements
 
@@ -28,13 +28,7 @@ A Terraform module to configure ACI Access Policies.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_access"></a> [access](#input\_access) | Access Model data. | `any` | n/a | yes |
-| <a name="input_apic_version"></a> [apic\_version](#input\_apic\_version) | The Version of ACI Running in the Environment. | `string` | `""` | no |
-| <a name="input_virtual_networking"></a> [virtual\_networking](#input\_virtual\_networking) | Viritual Networking Model data. | `any` | n/a | yes |
-| <a name="input_annotations"></a> [annotations](#input\_annotations) | The Version of this Script. | <pre>list(object(<br>    {<br>      key   = string<br>      value = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "key": "orchestrator",<br>    "value": "terraform:easy-aci:v2.0"<br>  }<br>]</pre> | no |
-| <a name="input_controller_type"></a> [controller\_type](#input\_controller\_type) | The Type of Controller for this Site.<br>- apic<br>- ndo | `string` | `"apic"` | no |
-| <a name="input_management_epgs"></a> [management\_epgs](#input\_management\_epgs) | The Management EPG's that will be used by the script.<br>- name: Name of the EPG<br>- type: Type of EPG<br>  * inb<br>  * oob | <pre>list(object(<br>    {<br>      name = string<br>      type = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "name": "default",<br>    "type": "oob"<br>  }<br>]</pre> | no |
-| <a name="input_mcp_instance_key"></a> [mcp\_instance\_key](#input\_mcp\_instance\_key) | The key or password to uniquely identify the MCP packets within this fabric. | `string` | n/a | yes |
-| <a name="input_vmm_password"></a> [vmm\_password](#input\_vmm\_password) | Password for VMM Credentials Policy. | `string` | `""` | no |
+| <a name="input_access_sensitive"></a> [access\_sensitive](#input\_access\_sensitive) | Note: Sensitive Variables cannot be added to a for\_each loop so these are added seperately.<br>    * mcp\_instance\_policy\_default: MisCabling Protocol Instance Settings.<br>      - key: The key or password used to uniquely identify this configuration object.<br>    * virtual\_networking: ACI to Virtual Infrastructure Integration.<br>      - password: Username/Password combination to Authenticate to the Virtual Infrastructure. | <pre>object({<br>    mcp_instance_policy_default = object({<br>      key = map(string)<br>    })<br>    virtual_networking = object({<br>      password = map(string)<br>    })<br>  })</pre> | <pre>{<br>  "mcp_instance_policy_default": {<br>    "key": {}<br>  },<br>  "virtual_networking": {<br>    "password": {}<br>  }<br>}</pre> | no |
 ## Outputs
 
 | Name | Description |

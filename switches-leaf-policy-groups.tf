@@ -85,12 +85,12 @@ resource "aci_access_switch_policy_group" "map" {
   ) > 0 ? "uni/infra/bfdIpv6Inst-${each.value.bfd_ipv6_policy}" : ""
   # class: bfdMhIpv4InstPol
   relation_infra_rs_bfd_mh_ipv4_inst_pol = length(regexall(
-    "^([5-9]|[1-9][0-9])\\.", var.apic_version)
+    "^([5-9]|[1-9][0-9])\\.", local.apic_version)
     ) > 0 && length(compact([each.value.bfd_multihop_ipv4_policy])
   ) > 0 ? "uni/infra/bfdMhIpv4Inst-${each.value.bfd_multihop_ipv4_policy}" : ""
   # class: bfdMhIpv6InstPol
   relation_infra_rs_bfd_mh_ipv6_inst_pol = length(regexall(
-    "^([5-9]|[1-9][0-9])\\.", var.apic_version)
+    "^([5-9]|[1-9][0-9])\\.", local.apic_version)
     ) > 0 && length(compact([each.value.bfd_multihop_ipv6_policy])
   ) > 0 ? "uni/infra/bfdMhIpv6Inst-${each.value.bfd_multihop_ipv6_policy}" : ""
   # class: equipmentFlashConfigPol

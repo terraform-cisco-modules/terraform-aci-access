@@ -73,22 +73,6 @@ resource "aci_rest_managed" "dhcp_relay" {
     }
   }
 }
-#resource "aci_dhcp_relay_policy" "dhcp_relay" {
-#  for_each    = local.dhcp_relay
-#  description = each.value.description
-#  mode        = each.value.mode
-#  name        = each.key
-#  owner       = "infra"
-#  tenant_dn   = "uni/infra"
-#  relation_dhcp_rs_prov {
-#    addr = each.value.address
-#    tdn = length(
-#      regexall("external_epg", each.value.epg_type)
-#      ) > 0 ? "uni/tn-${each.value.tenant}/out-${each.value.l3out}/instP-${each.value.epg}" : length(
-#      regexall("application_epg", each.value.epg_type)
-#    ) > 0 ? "uni/tn-${each.value.tenant}/ap-${each.value.application_profile}/epg-${each.value.epg}" : ""
-#  }
-#}
 
 /*_____________________________________________________________________________________________________________________
 
@@ -134,7 +118,7 @@ resource "aci_mcp_instance_policy" "map" {
   ) > 0 ? ["pdu-per-vlan", "stateful-ha"] : ["stateful-ha"]
   description      = each.value.description
   init_delay_time  = each.value.initial_delay
-  key              = var.mcp_instance_key
+  key              = var.access_sensitive.mcp_instance_policy_default.key[each.value.key]
   loop_detect_mult = each.value.loop_detect_multiplication_factor
   loop_protect_act = each.value.loop_protect_action == true ? "port-disable" : "none"
   tx_freq          = each.value.transmission_frequency.seconds

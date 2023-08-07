@@ -6,7 +6,7 @@ defaults:
       leaf:
         policy_groups:
           access:
-            attachable_entity_profile: '**REQUIRED**'
+            attachable_entity_profile: ''
             cdp_interface_policy: default
             copp_interface_policy: default
             data_plane_policing_egress: default
@@ -24,7 +24,7 @@ defaults:
             macsec_policy: default
             mcp_interface_policy: default
             monitoring_policy: default
-            name: '**REQUIRED**'
+            name: ''
             poe_interface_policy: ''
             port_security_policy: default
             priority_flow_control_policy: default
@@ -37,9 +37,9 @@ defaults:
           breakout:
             breakout_map: 10g-4x
             description: ''
-            name: '**REQUIRED**'
+            name: ''
           bundle:
-            attachable_entity_profile: '**REQUIRED**'
+            attachable_entity_profile: ''
             cdp_interface_policy: default
             copp_interface_policy: default
             data_plane_policing_egress: default
@@ -55,7 +55,7 @@ defaults:
             macsec_policy: default
             mcp_interface_policy: default
             monitoring_policy: default
-            name: '**REQUIRED**'
+            name: ''
             port_channel_policy: default
             port_security_policy: default
             priority_flow_control_policy: default
@@ -66,24 +66,24 @@ defaults:
             storm_control_policy: default
           netflow_monitor_policies:
             ip_filter_type: ipv4
-            netflow_monitor_policy: '**REQUIRED**'
+            netflow_monitor_policy: ''
       spine:
         policy_groups:
-          attachable_entity_profile: '**REQUIRED**'
+          attachable_entity_profile: ''
           cdp_interface_policy: default
           copp_interface_policy: default
           description: ''
           global_alias: ''
           link_level_policy: default
           macsec_policy: default
-          name: '**REQUIRED**'
+          name: ''
     physical_and_external_domains:
       l3_domains:
-        name: '**REQUIRED**'
-        vlan_pool: '**REQUIRED**'
+        name: ''
+        vlan_pool: ''
       physical_domains:
-        name: '**REQUIRED**'
-        vlan_pool: '**REQUIRED**'
+        name: ''
+        vlan_pool: ''
     # POLICIES
     policies:
       # GLOBAL POLICIES
@@ -94,14 +94,14 @@ defaults:
           description: ''
           instrumentation_immediacy: on-demand
           l3_domains: []
-          name: '**REQUIRED**'
+          name: ''
           physical_domains: []
           vmm_domains: []
         dhcp_relay:
-          dhcp_servers: ['**REQUIRED**']
+          dhcp_servers: ['']
           description: ''
           application_profile: default
-          epg: '**REQUIRED**'
+          epg: ''
           epg_type: application_epg
           l3out: ''
           mode: visible
@@ -118,6 +118,7 @@ defaults:
           description: ''
           enable_mcp_pdu_per_vlan: true
           initial_delay: 180
+          key: 1
           loop_detect_multiplication_factor: 3
           loop_protect_action: true
           name: default
@@ -151,19 +152,19 @@ defaults:
           admin_state: disabled
           description: ''
           global_alias: ''
-          name: '**REQUIRED**'
+          name: ''
         fibre_channel_interface:
           auto_max_speed: 32G
           description: ''
           fill_pattern: IDLE
-          name: '**REQUIRED**'
+          name: ''
           port_mode: f
           receive_buffer_credit: 64
           speed: auto
           trunk_mode: trunk-off
         l2_interface:
           description: ''
-          name: '**REQUIRED**'
+          name: ''
           qinq: disabled
           reflective_relay: disabled
           vlan_scope: global
@@ -174,20 +175,20 @@ defaults:
           forwarding_error_correction: inherit
           global_alias: ''
           link_debounce_interval: 100
-          name: '**REQUIRED**'
+          name: ''
           physical_media_type: auto
           port_delay_when_coming_up: 0
           speed: inherit
         lldp_interface:
           description: ''
           global_alias: ''
-          name: '**REQUIRED**'
+          name: ''
           receive_state: disabled
           transmit_state: disabled
         mcp_interface:
           admin_state: disabled
           description: ''
-          name: '**REQUIRED**'
+          name: ''
         port_channel:
           control:
             fast_select_hot_standby_ports: true
@@ -200,18 +201,18 @@ defaults:
           maximum_number_of_links: 16
           minimum_number_of_links: 1
           mode: active
-          name: '**REQUIRED**'
+          name: ''
         port_security:
           description: ''
           maximum_endpoints: 0
-          name: '**REQUIRED**'
+          name: ''
           port_security_timeout: 60
         spanning_tree_interface:
           bpdu_filter: disabled
           bpdu_guard: disabled
           description: ''
           global_alias: ''
-          name: '**REQUIRED**'
+          name: ''
       # SWITCH POLICIES
       switch:
         vpc_domain:
@@ -226,7 +227,7 @@ defaults:
           allocation_mode: inherit
           description: ''
           role: external
-          vlan_range: '**REQUIRED**'
+          vlan_range: ''
     # SWITCHES
     switches:
       leaf:
@@ -454,10 +455,11 @@ defaults:
         credentials:
           description: ''
           name: '' # If Undefined use first part of username
-          username: '**REQUIRED**'
-        datacenter: '**REQUIRED**'
+          password: 1
+          username: ''
+        datacenter: ''
         dvs_version: 'unmanaged'
-        hostname: '**REQUIRED**'
+        hostname: ''
         management_epg: 'default'
         monitoring_policy: 'default'
         name: '' # If Undefined use Hostname
@@ -473,7 +475,7 @@ defaults:
       endpoint_inventory_type: 'on-link'
       endpoint_retention_time: 0
       enforcement: 'hw'
-      name: '**REQUIRED**'
+      name: ''
       preferred_encapsulation: 'unspecified'
       switch_mode: 'default'
       switch_provider: 'VMware'
@@ -485,7 +487,7 @@ defaults:
         enhanced_lag_policy:
           load_balancing_mode: src-dst-ip
           mode: active
-          name: '**REQUIRED**'
+          name: ''
           number_of_links: 2
         firewall_policy: 'default'
         lldp_policy: 'default'
@@ -493,6 +495,6 @@ defaults:
         netflow_export_policy_parameters:
           active_flow_timeout: 60
           idle_flow_timeout: 15
-          netflow_export_policy: '**REQUIRED**'
+          netflow_export_policy: ''
           sample_rate: 0
         port_channel_policy: 'default'
