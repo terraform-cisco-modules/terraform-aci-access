@@ -4,14 +4,14 @@ locals {
   # Model Inputs
   #__________________________________________________________
 
-  apic_version  = var.access.controller.version
+  apic_version  = var.access.global_settings.controller.version
   defaults      = yamldecode(file("${path.module}/defaults.yaml")).defaults
   domains       = lookup(var.access, "physical_and_external_domains", {})
   global        = lookup(lookup(var.access, "policies", {}), "global", {})
   interface     = lookup(lookup(var.access, "policies", {}), "interface", {})
   intf_pg_leaf  = lookup(lookup(var.access, "interfaces", {}), "leaf", {})
   intf_pg_spine = lookup(lookup(var.access, "interfaces", {}), "spine", {})
-  mgmt_epgs     = var.access.management_epgs
+  mgmt_epgs     = var.access.global_settings.management_epgs
   pools         = lookup(var.access, "pools", {})
   pre_built     = local.defaults.access.pre_built_interface_policies
   pre_cfg = lookup(local.interface, "create_pre_built_interface_policies", {
@@ -97,9 +97,9 @@ locals {
       allowed_vlans         = lookup(v, "allowed_vlans", "")
       description           = lookup(v, "description", local.aaep.description)
       domains = compact(concat(
-        [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.map["${i}"].id],
-        [for i in lookup(v, "physical_domains", []) : aci_physical_domain.map["${i}"].id],
-        [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.map["${i}"].id]
+        [for i in lookup(v, "l3_domains", []) : aci_l3_domain_profile.map[i].id],
+        [for i in lookup(v, "physical_domains", []) : aci_physical_domain.map[i].id],
+        [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.map[i].id]
       ))
     }
   }
