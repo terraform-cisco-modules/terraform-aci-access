@@ -101,6 +101,7 @@ locals {
         [for i in lookup(v, "physical_domains", []) : aci_physical_domain.map[i].id],
         [for i in lookup(v, "vmm_domains", []) : aci_vmm_domain.map[i].id]
       ))
+      instrumentation_immediacy = lookup(v, "instrumentation_immediacy", "on-demand")
     }
   }
 
