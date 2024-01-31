@@ -17,12 +17,12 @@ A Terraform module to configure ACI Access Policies.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.9.0 |
+| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.13.0 |
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aci"></a> [aci](#provider\_aci) | 2.10.1 |
+| <a name="provider_aci"></a> [aci](#provider\_aci) | 2.13.0 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
