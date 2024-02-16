@@ -335,7 +335,7 @@ locals {
           vlan_pool       = v.vlan_pool
         }
       ]
-    ]) : "${i.vlan_pool}:${i.from}-${i.to}" => i
+    ]) : "${i.vlan_pool}/${i.from}/${i.to}" => i
   }
 
 
@@ -373,7 +373,7 @@ locals {
             switch_scope    = v.switch_scope
         })
       ]
-    ]) : "${i.domain}:${i.hostname}" => i
+    ]) : "${i.domain}/${i.hostname}" => i
   }
   vmm_credentials = { for i in flatten([
     for k, v in local.vmm_controllers : [
@@ -387,7 +387,7 @@ locals {
         user_split  = element(split("@", e.username), 0)
       }
     ]
-  ]) : "${i.domain}:${i.controller}:${i.user_split}" => i }
+  ]) : "${i.domain}/${i.controller}/${i.user_split}" => i }
 
   vswitch_policies = { for i in flatten([
     for k, v in local.vmm_domains : [
@@ -425,6 +425,6 @@ locals {
         uplinkName      = element(v.uplink_names, s)
       }
     ]
-    ]) : "${i.domain}:${i.uplinkName}" => i if i.access_mode == "read-write"
+    ]) : "${i.domain}/${i.uplinkName}" => i if i.access_mode == "read-write"
   }
 }
