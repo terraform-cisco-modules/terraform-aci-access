@@ -364,7 +364,7 @@ locals {
           {
             credentials = merge(local.vmm.controllers.credentials, e.credentials)
             domain      = k
-            dn_key      = "${k}:${e.hostname}:${lookup(lookup(e, "credentials", {}), "name", element(split("@", e.credentials.username), 0))}"
+            dn_key      = "${k}/${e.hostname}/${lookup(lookup(e, "credentials", {}), "name", element(split("@", e.credentials.username), 0))}"
             mgmt_epg_type = local.mgmt_epgs[index(local.mgmt_epgs[*].name,
               lookup(e, "management_epg", local.vmm.controllers.management_epg))
             ].type
