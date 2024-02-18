@@ -71,13 +71,13 @@ locals {
   #__________________________________________________________
 
   l3_domains = {
-    for k, v in lookup(local.domains, "l3_domains", {}) : v.name => {
+    for v in lookup(local.domains, "l3_domains", []) : v.name => {
       vlan_pool = lookup(v, "vlan_pool", local.l3.vlan_pool)
     }
   }
 
   physical_domains = {
-    for k, v in lookup(local.domains, "physical_domains", {}) : v.name => {
+    for v in lookup(local.domains, "physical_domains", []) : v.name => {
       vlan_pool = lookup(v, "vlan_pool", local.phys.vlan_pool)
     }
   }
@@ -92,7 +92,7 @@ locals {
   #===================================
 
   attachable_access_entity_profiles = {
-    for k, v in lookup(local.global, "attachable_access_entity_profiles", {}) : v.name => {
+    for v in lookup(local.global, "attachable_access_entity_profiles", []) : v.name => {
       access_or_native_vlan = lookup(v, "access_or_native_vlan", 0)
       allowed_vlans         = lookup(v, "allowed_vlans", "")
       description           = lookup(v, "description", local.aaep.description)
@@ -109,7 +109,7 @@ locals {
   # Global - DHCP Relay
   #===================================
   dhcp_relay = { for i in flatten([
-    for k, v in lookup(local.global, "dhcp_relay", []) : [
+    for v in lookup(local.global, "dhcp_relay", []) : [
       for s in v.dhcp_servers : {
         address             = s
         application_profile = lookup(v, "application_profile", local.dhcp.application_profile)
@@ -240,7 +240,7 @@ locals {
   }
 
   leaf_interfaces_policy_groups_breakout = {
-    for k, v in lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "breakout", {}) : v.name => {
+    for v in lookup(lookup(local.intf_pg_leaf, "policy_groups", {}), "breakout", []) : v.name => {
       breakout_map = lookup(v, "breakout_map", local.lbrkout.breakout_map)
       description  = lookup(v, "description", local.lbrkout.description)
     }
@@ -296,7 +296,7 @@ locals {
   # This first loop is to handle optional attributes and return 
   # default values if the user doesn't enter a value.
   vlan_pools = {
-    for k, v in lookup(local.pools, "vlan", {}) : v.name => {
+    for v in lookup(local.pools, "vlan", []) : v.name => {
       allocation_mode = lookup(v, "allocation_mode", local.vlan.allocation_mode)
       description     = lookup(v, "description", local.vlan.description)
       encap_blocks    = lookup(v, "encap_blocks", [])
