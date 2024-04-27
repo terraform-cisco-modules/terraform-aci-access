@@ -13,7 +13,7 @@ resource "aci_attachable_access_entity_profile" "map" {
     aci_physical_domain.map,
     aci_vmm_domain.map
   ]
-  for_each                = local.attachable_access_entity_profiles
+  for_each                = { for k, v in local.attachable_access_entity_profiles : k => v if v.create == true }
   description             = each.value.description
   name                    = each.key
   relation_infra_rs_dom_p = each.value.domains
@@ -32,7 +32,7 @@ resource "aci_access_generic" "map" {
   depends_on = [
     aci_attachable_access_entity_profile.map
   ]
-  for_each                            = local.attachable_access_entity_profiles
+  for_each                            = { for k, v in local.attachable_access_entity_profiles : k => v if v.create == true }
   attachable_access_entity_profile_dn = aci_attachable_access_entity_profile.map[each.key].id
   name                                = "default"
 }

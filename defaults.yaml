@@ -91,6 +91,7 @@ defaults:
         attachable_access_entity_profiles:
           access_or_native_vlan: null
           allowed_vlans: ''
+          create: true
           description: ''
           instrumentation_immediacy: on-demand
           l3_domains: []
